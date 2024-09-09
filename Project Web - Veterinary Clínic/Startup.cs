@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Project_Web___Veterinary_Clínic.Data;
 using Project_Web___Veterinary_Clínic.Data.Entities;
+using Project_Web___Veterinary_Clínic.Helpers;
 
 namespace Project_Web___Veterinary_Clínic
 {
@@ -42,6 +43,25 @@ namespace Project_Web___Veterinary_Clínic
                 cfg.UseSqlServer(this.Configuration.GetConnectionString("DefaultConnection"));
             });
 
+            services.AddTransient<SeedDb>();
+
+            services.AddScoped<IAnimalRepository, AnimalRepository>();
+            
+            services.AddScoped<IUserHelper, UserHelper>();
+
+            services.AddScoped<IImageHelper, ImageHelper>();
+            
+            services.AddScoped<IConverterHelper, ConverterHelper>();
+
+            
+            
+
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = "/Account/NotAuthorized";
+                options.AccessDeniedPath = "/Account/NotAuthorized";
+            });
+
             services.AddControllersWithViews();
         }
 
@@ -58,11 +78,15 @@ namespace Project_Web___Veterinary_Clínic
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            app.UseStatusCodePagesWithReExecute("/error/{0}");
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

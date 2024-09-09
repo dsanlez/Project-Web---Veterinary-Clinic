@@ -16,8 +16,11 @@ namespace Project_Web___Veterinary_Clínic.Data.Entities
         [Required]
         [Display(Name = "Date of birth")]
         public DateTime BirthDate { get; set; }
-       
-       
-        
+
+        [Display(Name = "Image")]
+        public string ImageUrl { get; set; }
+
+        public User User { get; set; }
+
     }
 }
