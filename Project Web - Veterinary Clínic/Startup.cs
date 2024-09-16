@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Project_Web___Veterinary_Clínic.Data;
 using Project_Web___Veterinary_Clínic.Data.Entities;
 using Project_Web___Veterinary_Clínic.Helpers;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Project_Web___Veterinary_Clínic
 {
@@ -34,8 +35,11 @@ namespace Project_Web___Veterinary_Clínic
                 cfg.Password.RequireLowercase = false;
                 cfg.Password.RequireNonAlphanumeric = false;
                 cfg.Password.RequiredLength = 6;
+                cfg.Tokens.AuthenticatorTokenProvider = TokenOptions.DefaultAuthenticatorProvider;
+                cfg.SignIn.RequireConfirmedEmail = true;
             })
 
+             .AddDefaultTokenProviders()
             .AddEntityFrameworkStores<DataContext>();
 
             services.AddDbContext<DataContext>(cfg =>
@@ -46,15 +50,19 @@ namespace Project_Web___Veterinary_Clínic
             services.AddTransient<SeedDb>();
 
             services.AddScoped<IAnimalRepository, AnimalRepository>();
-            
+
+            services.AddScoped<IRoomRepository, RoomRepository>();
+
+            services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+
             services.AddScoped<IUserHelper, UserHelper>();
 
             services.AddScoped<IImageHelper, ImageHelper>();
-            
+
             services.AddScoped<IConverterHelper, ConverterHelper>();
 
-            
-            
+            services.AddScoped<IEmailHelper, EmailHelper>();
+
 
             services.ConfigureApplicationCookie(options =>
             {

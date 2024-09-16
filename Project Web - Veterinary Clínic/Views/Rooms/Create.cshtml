@@ -1,0 +1,23 @@
+﻿@model Project_Web___Veterinary_Clínic.Data.Entities.Room
+
+<h2>Room</h2>
+
+<form asp-action="Create">
+    <div class="form-group">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+   
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
+<div>
+    <a asp-action="Index" class="btn btn-success">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

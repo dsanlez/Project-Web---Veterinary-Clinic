@@ -1,0 +1,27 @@
+﻿@model Project_Web___Veterinary_Clínic.Data.Entities.Room
+
+@{
+    ViewData["Title"] = "Delete Room";
+}
+
+<h1>Delete Room</h1>
+
+<h3>Are you sure you want to delete this room?</h3>
+<div>
+    <h4>Room</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            Name
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Name
+        </dd>     
+    </dl>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Delete" class="btn btn-danger" /> |
+        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>

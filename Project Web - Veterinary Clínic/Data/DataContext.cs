@@ -8,6 +8,9 @@ namespace Project_Web___Veterinary_Clínic.Data
     {
         public DbSet<Animal> Animals{ get; set; }
 
+        public DbSet<Appointment> Appointments { get; set; }
+        public DbSet<Room> Rooms { get; set; }
+
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
 

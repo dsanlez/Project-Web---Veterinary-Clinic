@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Project_Web___Veterinary_Clínic.Data.Entities;
 using Project_Web___Veterinary_Clínic.Helpers;
 using Project_Web___Veterinary_Clínic.Models;
@@ -11,10 +12,16 @@ namespace Project_Web___Veterinary_Clínic.Controllers
     public class AccountController : Controller
     {
         private readonly IUserHelper _userHelper;
+        private readonly IEmailHelper _emailHelper;
+        private readonly IConfiguration _configuration;
 
-        public AccountController(IUserHelper userHelper)
+        public AccountController(IUserHelper userHelper,
+            IEmailHelper emailHelper,
+            IConfiguration configuration)
         {
             _userHelper = userHelper;
+            _emailHelper = emailHelper;
+            _configuration = configuration;
         }
 
         [HttpGet]
@@ -54,9 +61,13 @@ namespace Project_Web___Veterinary_Clínic.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        public IActionResult Register()
+        public async Task<IActionResult> Register()
         {
-            return View();
+            var model = new RegisterNewUserViewModel
+            {
+                Roles = await _userHelper.GetRolesSelectListAsync() 
+            };
+            return View(model);
         }
 
         [HttpPost]
@@ -65,6 +76,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _userHelper.GetUserByEmailAsync(model.Username);
+
                 if (user == null)
                 {
                     user = new User
@@ -72,19 +84,27 @@ namespace Project_Web___Veterinary_Clínic.Controllers
                         FirstName = model.FirstName,
                         LastName = model.LastName,
                         Email = model.Username,
-                        UserName = model.Username
+                        UserName = model.Username,
+                        Address = model.Address,
+                        PhoneNumber = model.PhoneNumber
                     };
 
 
                     var result = await _userHelper.AddUserAsync(user, model.Password);
+
                     if (result != IdentityResult.Success)
                     {
                         ModelState.AddModelError(string.Empty, "The user couldn't be created");
                         return View(model);
                     }
 
-                    await _userHelper.AddUserToRoleAsync(user, "Customer");
+                    
+                    if (!string.IsNullOrEmpty(model.SelectedRole))
+                    {
+                        await _userHelper.AddUserToRoleAsync(user, model.SelectedRole);
+                    }
 
+                   
                     var loginViewModel = new LoginViewModel
                     {
                         Password = model.Password,
@@ -92,16 +112,31 @@ namespace Project_Web___Veterinary_Clínic.Controllers
                         Username = model.Username
                     };
 
-                    var result2 = await _userHelper.LoginAsync(loginViewModel);
-                    if (result2.Succeeded)
+                    string myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+
+                    string tokenLink = Url.Action("ConfirmEmail", "Account", new
                     {
-                        return RedirectToAction("Index", "Home");
+                        userId = user.Id,
+                        token = myToken,
+
+                    }, protocol: HttpContext.Request.Scheme);
+
+
+                    Response response = _emailHelper.SendEmail(model.Username, "Email confirmation", $"<h1>Email confirmation</h1>" +
+                           $"To allow the user," +
+                           $"please click on this link:</br></br><a href= \"{tokenLink}\">Confirm Email</a>");
+
+                    if (response.IsSuccess)
+                    {
+                        //ViewBag.Message = "The instructions to grant access to your user have been sent to your email";
+                        TempData["SuccessMessage"] = "The instructions to grant access to your user have been sent to your email";
+                        //return View(model);
+                        return RedirectToAction("Login", "Account");
                     }
-
                     ModelState.AddModelError(string.Empty, "The user couldn't be logged");
-
                 }
             }
+            model.Roles = await _userHelper.GetRolesSelectListAsync();
             return View(model);
         }
 
@@ -177,6 +212,98 @@ namespace Project_Web___Veterinary_Clínic.Controllers
             }
             return this.View(model);
         }
+
+        public async Task<IActionResult> ConfirmEmail(string userId, string token)
+        {
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token))
+            {
+                return NotFound();
+            }
+
+            var user = await _userHelper.GetUserByIdAsync(userId);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var result = await _userHelper.ConfirmEmailAsync(user, token);
+
+            if (!result.Succeeded)
+            {
+                return NotFound();
+            }
+
+            return View();
+        }
+
+        public IActionResult RecoverPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RecoverPassword(RecoverPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userHelper.GetUserByEmailAsync(model.Email);
+
+                if (user == null)
+                {
+                    ModelState.AddModelError(string.Empty, "The email doesn't match a registered username.");
+                    return View(model);
+                }
+
+                var myToken = await _userHelper.GeneratePasswordResetTokenAsync(user);
+
+                var link = Url.Action(
+                    "Reset password",
+                    "Account",
+                    new { token = myToken }, protocol: HttpContext.Request.Scheme);
+
+                Response response = _emailHelper.SendEmail(model.Email, "Shop Password Reset", $"<h1>Shop Password Reset</h1>" +
+                    $"To reset the password click on the link:</br></br>" +
+                    $"<a href= \"{link}\">Reset Password</a>");
+
+                if (response.IsSuccess)
+                {
+                    ViewBag.Message = "The instructions to recover your password have been sent to your email";
+                }
+
+                return View();
+            }
+
+            return View(model);
+        }
+
+        public IActionResult ResetPassword(string token)
+        {
+            return View();
+        }
+
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            var user = await _userHelper.GetUserByEmailAsync(model.Username);
+
+            if (user != null)
+            {
+                var result = await _userHelper.ResetPasswordAsync(user, model.Token, model.Password);
+
+                if (result.Succeeded)
+                {
+                    ViewBag.Message = "Password successfully reset.";
+                    return View();
+                }
+
+                ViewBag.Message = "Error resetting the password";
+                return View(model);
+            }
+
+            ViewBag.Message = "Username not found.";
+            return View(model);
+        }
+
 
         public IActionResult NotAuthorized()
         {

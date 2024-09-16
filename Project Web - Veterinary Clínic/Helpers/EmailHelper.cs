@@ -5,7 +5,7 @@ using System;
 
 namespace Project_Web___Veterinary_Clínic.Helpers
 {
-    public class EmailHelper
+    public class EmailHelper : IEmailHelper
     {
         private readonly IConfiguration _configuration;
 

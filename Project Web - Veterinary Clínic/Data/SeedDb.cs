@@ -29,9 +29,8 @@ namespace Project_Web___Veterinary_Clínic.Data
             await _context.Database.MigrateAsync();
 
             await _userHelper.CheckRoleAsync("Admin");
-            await _userHelper.CheckRoleAsync("Doctor");
+            await _userHelper.CheckRoleAsync("Veterinarian");
             await _userHelper.CheckRoleAsync("Customer");
-            await _userHelper.CheckRoleAsync("Anonymous");
 
             var user = await _userHelper.GetUserByEmailAsync("diogosdl25@hotmail.com");
 
@@ -54,6 +53,10 @@ namespace Project_Web___Veterinary_Clínic.Data
                 }
 
                 await _userHelper.AddUserToRoleAsync(user, "Admin");
+
+                var token = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+
+                await _userHelper.ConfirmEmailAsync(user, token);
             }
 
             var isInRole = await _userHelper.IsUserInRoleAsync(user, "Admin");

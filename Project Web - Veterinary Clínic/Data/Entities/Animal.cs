@@ -22,5 +22,18 @@ namespace Project_Web___Veterinary_Clínic.Data.Entities
 
         public User User { get; set; }
 
+        public string ImageFullPath
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(ImageUrl))
+                {
+                    return null;
+                }
+
+                return $"https://localhost:44363{ImageUrl.Substring(1)}";
+            }
+        }
+
     }
 }

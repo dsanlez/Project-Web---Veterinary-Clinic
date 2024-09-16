@@ -105,8 +105,12 @@ namespace Project_Web___Veterinary_Clínic.Controllers
             {
                 return new NotFoundViewResult("AnimalNotFound");
             }
-            return View(animal);
+
+            var model = _converterHelper.ToAnimalViewModel(animal);
+            return View(model);
         }
+           
+        
 
         // POST: Animals/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -129,6 +133,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
                     var animal = _converterHelper.ToAnimal(model, path, false);
 
                     animal.User = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
+
                     await _animalRepository.UpdateAsync(animal);
 
                 }
@@ -140,7 +145,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
                     }
                     else
                     {
-                        throw;
+                        return new NotFoundViewResult("Error404");
                     }
                 }
                 return RedirectToAction(nameof(Index));
@@ -177,7 +182,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult ProductNotFound()
+        public IActionResult AnimalNotFound()
         {
             return View();
         }

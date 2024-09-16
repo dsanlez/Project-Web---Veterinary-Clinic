@@ -1,0 +1,42 @@
+﻿@model Project_Web___Veterinary_Clínic.Models.AppointmentViewModel
+
+<h2>Create Appointment</h2>
+
+<form asp-action="Create">
+    <div class="form-group">
+        <label asp-for="Date"></label>
+        <input asp-for="Date" class="form-control />
+        <span asp-validation-for="Date" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="AnimalId">Animal</label>
+        <select asp-for="AnimalId" asp-items="Model.Animals" class="form-control"></select>
+        <span asp-validation-for="AnimalId" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="VeterinarianId">Veterinarian</label>
+        <select asp-for="VeterinarianId" asp-items="Model.Veterinarians" class="form-control"></select>
+        <span asp-validation-for="VeterinarianId" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="CustomerId">Customer</label>
+        <select asp-for="CustomerId" asp-items="Model.Customers" class="form-control"></select>
+        <span asp-validation-for="CustomerId" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="RoomId">Room</label>
+        <select asp-for="RoomId" asp-items="Model.Rooms" class="form-control"></select>
+        <span asp-validation-for="RoomId" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Create</button>
+</form>
+
+<div>
+    <a asp-action="Index" class="btn btn-success">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

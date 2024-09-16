@@ -1,6 +1,20 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿
+
+
+
+
+
+
+
+
+
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using Project_Web___Veterinary_Clínic.Data.Entities;
 using Project_Web___Veterinary_Clínic.Models;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Project_Web___Veterinary_Clínic.Helpers
@@ -71,6 +85,88 @@ namespace Project_Web___Veterinary_Clínic.Helpers
             return await _userManager.IsInRoleAsync(user, roleName);
         }
 
+        public async Task<string> GenerateEmailConfirmationTokenAsync(User user)
+        {
+            return await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        }
+
+        public async Task<IdentityResult> ConfirmEmailAsync(User user, string token)
+        {
+            return await _userManager.ConfirmEmailAsync(user, token);
+        }
+
+        public async Task<User> GetUserByIdAsync(string userId)
+        {
+            return await _userManager.FindByIdAsync(userId);
+        }
+
+        public async Task<string> GeneratePasswordResetTokenAsync(User user)
+        {
+            return await _userManager.GeneratePasswordResetTokenAsync(user);
+        }
+
+        public async Task<IdentityResult> ResetPasswordAsync(User user, string token, string password)
+        {
+            return await _userManager.ResetPasswordAsync(user, token, password);
+        }
+
+        public async Task<IEnumerable<SelectListItem>> GetRolesSelectListAsync()
+        {
+            var roles = await _roleManager.Roles.ToListAsync();
+            return roles.Select(r => new SelectListItem
+            {
+                Value = r.Name,
+                Text = r.Name
+            }).ToList();
+
+        }
         
+        public async Task<IEnumerable<SelectListItem>> GetAllVeterinariansAsync()
+        {
+            var roleName = "Veterinarian";
+            // Gets all the users with the role "Veterinarian"
+            var usersInRole = await _userManager.GetUsersInRoleAsync(roleName);
+
+            // Converts the list to a selected SelectListItem
+            var veterinarianList = usersInRole.Select(user => new SelectListItem
+            {
+                Text = user.FullName,
+                Value = user.Id.ToString()
+            }).ToList();
+
+            // Adds the defaults text
+            veterinarianList.Insert(0, new SelectListItem
+            {
+                Text = "(Select a veterinarian ...)",
+                Value = "0"
+            });
+
+            return veterinarianList;
+        }
+
+        public async Task<IEnumerable<SelectListItem>> GetAllCustomersAsync()
+        {
+            var roleName = "Customer";
+
+            // Gets all the users with the role "Customer"
+            var usersInRole = await _userManager.GetUsersInRoleAsync(roleName);
+
+            // Converts the list to a selected SelectListItem
+            var customerList = usersInRole.Select(user => new SelectListItem
+            {
+                Text = user.FullName, 
+                Value = user.Id.ToString()
+            }).ToList();
+
+            // Adds the defaults text
+            customerList.Insert(0, new SelectListItem
+            {
+                Text = "(Select a customer ...)",
+                Value = "0"
+            });
+
+            return customerList;
+
+        }
     }
 }

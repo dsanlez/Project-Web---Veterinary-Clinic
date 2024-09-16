@@ -181,6 +181,65 @@ namespace Project_Web___Veterinary_Clínic.Migrations
                     b.ToTable("Animals");
                 });
 
+            modelBuilder.Entity("Project_Web___Veterinary_Clínic.Data.Entities.Appointment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("AnimalId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("AppointmentDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CustomerId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("RoomId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("VeterinarianId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AnimalId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("RoomId");
+
+                    b.HasIndex("VeterinarianId");
+
+                    b.ToTable("Appointments");
+                });
+
+            modelBuilder.Entity("Project_Web___Veterinary_Clínic.Data.Entities.Room", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Rooms");
+                });
+
             modelBuilder.Entity("Project_Web___Veterinary_Clínic.Data.Entities.User", b =>
                 {
                     b.Property<string>("Id")
@@ -188,6 +247,10 @@ namespace Project_Web___Veterinary_Clínic.Migrations
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
+
+                    b.Property<string>("Address")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -201,10 +264,12 @@ namespace Project_Web___Veterinary_Clínic.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("FirstName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("LastName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -310,6 +375,37 @@ namespace Project_Web___Veterinary_Clínic.Migrations
                         .HasForeignKey("UserId");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Project_Web___Veterinary_Clínic.Data.Entities.Appointment", b =>
+                {
+                    b.HasOne("Project_Web___Veterinary_Clínic.Data.Entities.Animal", "Animal")
+                        .WithMany()
+                        .HasForeignKey("AnimalId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Project_Web___Veterinary_Clínic.Data.Entities.User", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId");
+
+                    b.HasOne("Project_Web___Veterinary_Clínic.Data.Entities.Room", "Room")
+                        .WithMany()
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Project_Web___Veterinary_Clínic.Data.Entities.User", "Veterinarian")
+                        .WithMany()
+                        .HasForeignKey("VeterinarianId");
+
+                    b.Navigation("Animal");
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Room");
+
+                    b.Navigation("Veterinarian");
                 });
 #pragma warning restore 612, 618
         }
