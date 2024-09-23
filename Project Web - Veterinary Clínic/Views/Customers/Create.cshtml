@@ -3,7 +3,7 @@
     ViewData["Title"] = "Register";
 }
 
-<h2>Register</h2>
+<h2>Register Customer</h2>
 
 
 <div class="row">
@@ -22,12 +22,6 @@
                 <input asp-for="LastName" class="form-control" />
                 <span asp-validation-for="LastName" class="text-warning"></span>
             </div>
-
-           @*  <div class="form-group">
-                <label asp-for="SelectedRole" class="control-label"></label>
-                <select asp-for="SelectedRole" asp-items="Model.Roles" class="form-control"></select>
-                <span asp-validation-for="SelectedRole" class="text-danger"></span>
-            </div> *@
 
             <div class="form-group">
                 <label asp-for="Username">User Name</label>

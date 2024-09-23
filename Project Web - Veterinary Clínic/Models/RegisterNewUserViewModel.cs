@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -15,9 +16,9 @@ namespace Project_Web___Veterinary_Clínic.Models
         [Display(Name = "Last Name")]
         public string LastName { get; set; }
 
-        public IEnumerable<SelectListItem> Roles { get; set; }
+        //public IEnumerable<SelectListItem> Roles { get; set; }
 
-        public string SelectedRole { get; set; }
+        //public string SelectedRole { get; set; }
 
         [Required]
         [DataType(DataType.EmailAddress)]
@@ -38,5 +39,8 @@ namespace Project_Web___Veterinary_Clínic.Models
         [Required]
         [Compare("Password")]
         public string Confirm { get; set; }
+
+        [Display(Name = "Profile Picture")]
+        public IFormFile AvatarFile { get; set; }
     }
 }

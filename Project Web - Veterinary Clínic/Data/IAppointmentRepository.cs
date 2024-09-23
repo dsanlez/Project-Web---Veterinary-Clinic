@@ -7,5 +7,9 @@ namespace Project_Web___Veterinary_Clínic.Data
     public interface IAppointmentRepository : IGenericRepository<Appointment>
     {
         Task<IEnumerable<Appointment>> GetAllWithUsersAsync();
+
+        Task<IEnumerable<Appointment>> GetAppointmentsByVeterinarianAsync(string veterinarianId);
+
+        Task<IEnumerable<Appointment>> GetAppointmentsForTomorrowAsync();
     }
 }

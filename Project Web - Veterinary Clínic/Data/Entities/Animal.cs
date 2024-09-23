@@ -20,7 +20,8 @@ namespace Project_Web___Veterinary_Clínic.Data.Entities
         [Display(Name = "Image")]
         public string ImageUrl { get; set; }
 
-        public User User { get; set; }
+        [Required]
+        public User Dono { get; set; }
 
         public string ImageFullPath
         {

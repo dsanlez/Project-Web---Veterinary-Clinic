@@ -13,7 +13,10 @@ namespace Project_Web___Veterinary_Clínic.Data.Entities
 
         [MaxLength(100, ErrorMessage = "The field {0} can only contain {1} characters.")]
         public string Address { get; set; }
-        
+
+        [Display(Name = "Avatar")]
+        public string Avatar { get; set; }
+
         [Display(Name = "Full Name")]
         public string FullName => $"{FirstName} {LastName}";
     }

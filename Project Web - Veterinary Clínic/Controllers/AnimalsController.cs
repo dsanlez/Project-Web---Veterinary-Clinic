@@ -83,7 +83,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
 
                 var animal = _converterHelper.ToAnimal(model, path, true);
 
-                animal.User = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
+                animal.Dono = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
                 await _animalRepository.CreateAsync(animal);
 
                 return RedirectToAction(nameof(Index));
@@ -110,8 +110,6 @@ namespace Project_Web___Veterinary_Clínic.Controllers
             return View(model);
         }
            
-        
-
         // POST: Animals/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
@@ -132,7 +130,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
 
                     var animal = _converterHelper.ToAnimal(model, path, false);
 
-                    animal.User = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
+                    animal.Dono = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
 
                     await _animalRepository.UpdateAsync(animal);
 

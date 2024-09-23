@@ -19,7 +19,7 @@ namespace Project_Web___Veterinary_Clínic.Data
 
         public IQueryable GetAllWithUser()
         {
-            return _context.Animals.Include(p => p.User);
+            return _context.Animals.Include(p => p.Dono);
         }
 
         public async Task<IEnumerable<SelectListItem>> GetAllAnimalsAsync()

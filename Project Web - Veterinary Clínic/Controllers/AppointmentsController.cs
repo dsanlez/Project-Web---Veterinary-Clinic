@@ -17,16 +17,19 @@ namespace Project_Web___Veterinary_Clínic.Controllers
         private readonly IAnimalRepository _animalRepository;
         private readonly IUserHelper _userHelper;
         private readonly IRoomRepository _roomRepository;
+        private readonly IEmailHelper _emailHelper;
 
         public AppointmentsController(IAppointmentRepository appointmentRepository,
                                       IAnimalRepository animalRepository,
                                       IUserHelper userHelper,
-                                      IRoomRepository roomRepository)
+                                      IRoomRepository roomRepository,
+                                      IEmailHelper emailHelper)
         {
             _appointmentRepository = appointmentRepository;
             _animalRepository = animalRepository;
             _userHelper = userHelper;
             _roomRepository = roomRepository;
+            _emailHelper = emailHelper;
         }
 
         // Display all appointments
@@ -35,6 +38,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
             // Fetch all appointments using the generic repository
             var appointments = await _appointmentRepository.GetAllWithUsersAsync();
             return View(appointments);
+            
         }
 
         // Render the form to create a new appointment
@@ -313,6 +317,66 @@ namespace Project_Web___Veterinary_Clínic.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        public async Task<IActionResult> SendClinicClosureNoticeAsync()
+        {
+            var customers = await _userHelper.GetCustomersAsync();
+            string subject = "Warning: Clinic Closed";
+            string body = "Due to unforeseen circumstances, the clinic will be closed until further notice.";
+
+            foreach (var customer in customers)
+            {
+                _emailHelper.SendEmail(customer.Email, subject, body);
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> SendAppointmentRemindersAsync()
+        {
+            var appointments = await _appointmentRepository.GetAppointmentsForTomorrowAsync();
+            string subject = "Reminder: Appointment tomorrow!";
+
+            if (appointments == null || !appointments.Any())
+            {
+                TempData["InfoMessage"] = "No appointments found for tomorrow.";
+                return RedirectToAction("Index");
+            }
+
+            foreach (var appointment in appointments)
+            {
+                if (appointment.Customer == null || appointment.Veterinarian == null)
+                {
+                    return RedirectToAction("Index");
+                }
+
+                string body = $"Dear {appointment.Customer.FirstName},\nThis is a reminder that you have an appointment scheduled for tomorrow with Dr. {appointment.Veterinarian.FirstName}.";
+                _emailHelper.SendEmail(appointment.Customer.Email, subject, body);
+            }
+
+            TempData["SuccessMessage"] = "Appointment reminders sent successfully.";
+            return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> CancelAppointmentsByVeterinarianAsync(string veterinarianId)
+        {
+            var appointments = await _appointmentRepository.GetAppointmentsByVeterinarianAsync(veterinarianId);
+            string subject = "Appointment Cancelled";
+
+            foreach (var appointment in appointments)
+            {
+                string body = $"Dear {appointment.Customer.FirstName},\nUnfortunately, your appointment with Dr. {appointment.Veterinarian.FirstName} has been cancelled.\nWe will get in touch to reschedule the appointment.";
+                _emailHelper.SendEmail(appointment.Customer.Email, subject, body);
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> TestSendReminders()
+        {
+            await SendAppointmentRemindersAsync();
+            TempData["SuccessMessage"] = "Appointment reminders sent successfully.";
+            return RedirectToAction("Index"); 
+        }
     }
 }
 

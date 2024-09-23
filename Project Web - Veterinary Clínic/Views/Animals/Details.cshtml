@@ -29,6 +29,11 @@
             @Html.DisplayFor(model => model.BirthDate)
         </dd>
     </dl>
+    <div class="col-md-4">
+
+        <img src="@Url.Content(Model.ImageFullPath)" alt="Image" style="width:100px;height:150px;max-width:100%;height:auto">
+
+    </div>
 </div>
 <div>
     <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning" >Edit</a> 

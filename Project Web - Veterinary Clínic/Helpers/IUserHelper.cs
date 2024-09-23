@@ -13,6 +13,8 @@ namespace Project_Web___Veterinary_Clínic.Helpers
 
         Task<IdentityResult> AddUserAsync(User user, string password);
 
+        Task<IdentityResult> DeleteUserAsync(User user);
+
         Task<SignInResult> LoginAsync(LoginViewModel model);
 
         Task LogoutAsync();
@@ -41,6 +43,10 @@ namespace Project_Web___Veterinary_Clínic.Helpers
 
         Task<IEnumerable<SelectListItem>> GetAllVeterinariansAsync();
         Task<IEnumerable<SelectListItem>> GetAllCustomersAsync();
+
+        Task<IEnumerable<User>> GetCustomersAsync();
+
+        Task<IEnumerable<User>> GetVeterinariansAsync();
 
     }
 }

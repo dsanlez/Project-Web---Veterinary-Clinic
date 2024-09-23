@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Project_Web___Veterinary_Clínic.Data.Entities;
 using Project_Web___Veterinary_Clínic.Helpers;
+using Project_Web___Veterinary_Clínic.Migrations;
 using Project_Web___Veterinary_Clínic.Models;
 using System.Linq;
 using System.Threading.Tasks;
@@ -61,84 +62,84 @@ namespace Project_Web___Veterinary_Clínic.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        public async Task<IActionResult> Register()
-        {
-            var model = new RegisterNewUserViewModel
-            {
-                Roles = await _userHelper.GetRolesSelectListAsync() 
-            };
-            return View(model);
-        }
+        //public async Task<IActionResult> Register()
+        //{
+        //    var model = new RegisterNewUserViewModel
+        //    {
+        //        Roles = await _userHelper.GetRolesSelectListAsync() 
+        //    };
+        //    return View(model);
+        //}
 
-        [HttpPost]
-        public async Task<IActionResult> Register(RegisterNewUserViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                var user = await _userHelper.GetUserByEmailAsync(model.Username);
+        //[HttpPost]
+        //public async Task<IActionResult> Register(RegisterNewUserViewModel model)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        var user = await _userHelper.GetUserByEmailAsync(model.Username);
 
-                if (user == null)
-                {
-                    user = new User
-                    {
-                        FirstName = model.FirstName,
-                        LastName = model.LastName,
-                        Email = model.Username,
-                        UserName = model.Username,
-                        Address = model.Address,
-                        PhoneNumber = model.PhoneNumber
-                    };
-
-
-                    var result = await _userHelper.AddUserAsync(user, model.Password);
-
-                    if (result != IdentityResult.Success)
-                    {
-                        ModelState.AddModelError(string.Empty, "The user couldn't be created");
-                        return View(model);
-                    }
-
-                    
-                    if (!string.IsNullOrEmpty(model.SelectedRole))
-                    {
-                        await _userHelper.AddUserToRoleAsync(user, model.SelectedRole);
-                    }
-
-                   
-                    var loginViewModel = new LoginViewModel
-                    {
-                        Password = model.Password,
-                        RememberMe = false,
-                        Username = model.Username
-                    };
-
-                    string myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
-
-                    string tokenLink = Url.Action("ConfirmEmail", "Account", new
-                    {
-                        userId = user.Id,
-                        token = myToken,
-
-                    }, protocol: HttpContext.Request.Scheme);
+        //        if (user == null)
+        //        {
+        //            user = new User
+        //            {
+        //                FirstName = model.FirstName,
+        //                LastName = model.LastName,
+        //                Email = model.Username,
+        //                UserName = model.Username,
+        //                Address = model.Address,
+        //                PhoneNumber = model.PhoneNumber
+        //            };
 
 
-                    Response response = _emailHelper.SendEmail(model.Username, "Email confirmation", $"<h1>Email confirmation</h1>" +
-                           $"To allow the user," +
-                           $"please click on this link:</br></br><a href= \"{tokenLink}\">Confirm Email</a>");
+        //            var result = await _userHelper.AddUserAsync(user, model.Password);
 
-                    if (response.IsSuccess)
-                    {
-                        //ViewBag.Message = "The instructions to grant access to your user have been sent to your email";
-                        TempData["SuccessMessage"] = "The instructions to grant access to your user have been sent to your email";
-                        //return View(model);
-                        return RedirectToAction("Login", "Account");
-                    }
-                    ModelState.AddModelError(string.Empty, "The user couldn't be logged");
-                }
-            }
-            model.Roles = await _userHelper.GetRolesSelectListAsync();
-            return View(model);
-        }
+        //            if (result != IdentityResult.Success)
+        //            {
+        //                ModelState.AddModelError(string.Empty, "The user couldn't be created");
+        //                return View(model);
+        //            }
+
+
+        //            if (!string.IsNullOrEmpty(model.SelectedRole))
+        //            {
+        //                await _userHelper.AddUserToRoleAsync(user, model.SelectedRole);
+        //            }
+
+
+        //            var loginViewModel = new LoginViewModel
+        //            {
+        //                Password = model.Password,
+        //                RememberMe = false,
+        //                Username = model.Username
+        //            };
+
+        //            string myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+
+        //            string tokenLink = Url.Action("ConfirmEmail", "Account", new
+        //            {
+        //                userId = user.Id,
+        //                token = myToken,
+
+        //            }, protocol: HttpContext.Request.Scheme);
+
+
+        //            Response response = _emailHelper.SendEmail(model.Username, "Email confirmation", $"<h1>Email confirmation</h1>" +
+        //                   $"To allow the user," +
+        //                   $"please click on this link:</br></br><a href= \"{tokenLink}\">Confirm Email</a>");
+
+        //            if (response.IsSuccess)
+        //            {
+        //                //ViewBag.Message = "The instructions to grant access to your user have been sent to your email";
+        //                TempData["SuccessMessage"] = "The instructions to grant access to your user have been sent to your email";
+        //                //return View(model);
+        //                return RedirectToAction("Login", "Account");
+        //            }
+        //            ModelState.AddModelError(string.Empty, "The user couldn't be logged");
+        //        }
+        //    }
+        //    model.Roles = await _userHelper.GetRolesSelectListAsync();
+        //    return View(model);
+        //}
 
         public async Task<IActionResult> ChangeUser()
         {
@@ -258,9 +259,9 @@ namespace Project_Web___Veterinary_Clínic.Controllers
                 var myToken = await _userHelper.GeneratePasswordResetTokenAsync(user);
 
                 var link = Url.Action(
-                    "Reset password",
+                    "ResetPassword",
                     "Account",
-                    new { token = myToken }, protocol: HttpContext.Request.Scheme);
+                    new { token = myToken, email = user.UserName }, protocol: HttpContext.Request.Scheme);
 
                 Response response = _emailHelper.SendEmail(model.Email, "Shop Password Reset", $"<h1>Shop Password Reset</h1>" +
                     $"To reset the password click on the link:</br></br>" +
@@ -277,29 +278,63 @@ namespace Project_Web___Veterinary_Clínic.Controllers
             return View(model);
         }
 
-        public IActionResult ResetPassword(string token)
+        [HttpGet]
+        public IActionResult ResetPassword(string token, string email)
         {
-            return View();
+            if (token == null || email == null)
+            {
+                return NotFound();
+            }
+
+            var model = new ResetPasswordViewModel
+            {         
+                Username = email,
+                Token = token
+            };
+            return View(model);
         }
 
+        [HttpPost]
         public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
         {
             var user = await _userHelper.GetUserByEmailAsync(model.Username);
 
             if (user != null)
-            {
+            {                
                 var result = await _userHelper.ResetPasswordAsync(user, model.Token, model.Password);
 
+                if (!result.Succeeded)
+                {
+                    ViewBag.Message = "Password reset failed.";
+                    return View();
+                }
+
+                if (!user.EmailConfirmed)
+                {
+                    var confirmToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+
+                    result = await _userHelper.ConfirmEmailAsync(user, confirmToken);
+
+                    if (result.Succeeded)
+                    {
+                        ViewBag.Message = "Password successfully reset and account confirmed.";
+                        return View();
+                    }
+                    else
+                    {
+                        ViewBag.Message = "Password successfully reset but account confirmation failed!";
+                        return View();
+                    }
+                }
                 if (result.Succeeded)
                 {
                     ViewBag.Message = "Password successfully reset.";
                     return View();
                 }
 
-                ViewBag.Message = "Error resetting the password";
-                return View(model);
+                //ViewBag.Message = "Error resetting the password";
+                //return View(model);
             }
-
             ViewBag.Message = "Username not found.";
             return View(model);
         }

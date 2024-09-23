@@ -12,7 +12,7 @@ namespace Project_Web___Veterinary_Clínic.Helpers
                 Id = isNew ? 0 : model.Id,
                 Name = model.Name,
                 ImageUrl = path,
-                User = model.User,
+                Dono = model.Dono,
                 BirthDate = model.BirthDate,
                 Species = model.Species,
             };
@@ -25,7 +25,7 @@ namespace Project_Web___Veterinary_Clínic.Helpers
                 Id = animal.Id,
                 Name = animal.Name,
                 ImageUrl = animal.ImageUrl,
-                User = animal.User,
+                Dono = animal.Dono,
                 BirthDate = animal.BirthDate,
                 Species = animal.Species,
             };

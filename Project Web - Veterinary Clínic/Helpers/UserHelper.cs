@@ -36,6 +36,12 @@ namespace Project_Web___Veterinary_Clínic.Helpers
             return await _userManager.CreateAsync(user, password);
         }
 
+        public async Task<IdentityResult> DeleteUserAsync(User user)
+        {
+            return await _userManager.DeleteAsync(user);
+        }
+
+
         public async Task<User> GetUserByEmailAsync(string email)
         {
             return await _userManager.FindByEmailAsync(email);
@@ -167,6 +173,22 @@ namespace Project_Web___Veterinary_Clínic.Helpers
 
             return customerList;
 
+        }
+
+        public async Task<IEnumerable<User>> GetCustomersAsync()
+        {
+            var roleName = "Customer";
+            var usersInRole = await _userManager.GetUsersInRoleAsync(roleName);
+
+            return usersInRole; 
+        }
+
+        public async Task<IEnumerable<User>> GetVeterinariansAsync()
+        {
+            var roleName = "Veterinarian";
+            var usersInRole = await _userManager.GetUsersInRoleAsync(roleName);
+
+            return usersInRole;
         }
     }
 }
