@@ -130,6 +130,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
 
                     // Gerar token de redefinição de senha
                     string token = await _userHelper.GeneratePasswordResetTokenAsync(user);
+
                     string resetLink = Url.Action("ResetPassword", "Account", new
                     {
                         user = user.Id,
@@ -143,7 +144,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
 
                     if (response.IsSuccess)
                     {
-                        TempData["SuccessMessage"] = "The customer has been created successfully. Please check your email to set your password.";
+                        TempData["SuccessMessage"] = "The customer has been created successfully. Email was sent to set the password.";
                         return RedirectToAction("Index");
                     }
 

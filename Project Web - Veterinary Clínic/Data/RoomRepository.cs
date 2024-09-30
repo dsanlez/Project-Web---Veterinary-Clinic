@@ -25,13 +25,24 @@ namespace Project_Web___Veterinary_Clínic.Data
                 Value = room.Id.ToString()
             }).ToList();
 
-            roomsList.Insert(0, new SelectListItem
-            {
-                Text = "(Select a room ...)",
-                Value = "0"
-            });
+            //roomsList.Insert(0, new SelectListItem
+            //{
+            //    Text = "(Select a room ...)",
+            //    Value = "0"
+            //});
 
             return roomsList;
+        }
+
+        public async Task<IEnumerable<SelectListItem>> GetRoomSelectListAsync()
+        {
+            return await _context.Rooms
+                .Select(r => new SelectListItem
+                {
+                    Value = r.Id.ToString(),
+                    Text = r.Name
+                })
+                .ToListAsync();
         }
     }
 }

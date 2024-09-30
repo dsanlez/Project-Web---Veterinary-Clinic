@@ -67,29 +67,29 @@ namespace Project_Web___Veterinary_Clínic.Data
                 await _userHelper.AddUserToRoleAsync(user, "Admin");
             }
 
-            if (!_context.Animals.Any())
-            {
-                AddAnimal("Pirucas", "Cat", user);
-                AddAnimal("Bobby", "Dog", user);
-                AddAnimal("Cajó", "Dog", user);
-                AddAnimal("Marilú", "Dog", user);
-                await _context.SaveChangesAsync();
-            }
+            //    if (!_context.Animals.Any())
+            //    {
+            //        AddAnimal("Pirucas", "Cat", user);
+            //        AddAnimal("Bobby", "Dog", user);
+            //        AddAnimal("Cajó", "Dog", user);
+            //        AddAnimal("Marilú", "Dog", user);
+            //        await _context.SaveChangesAsync();
+            //    }
         }
 
-        private void AddAnimal(string name, string species, User user)
-        {
-            int year = _random.Next(2020, DateTime.Now.Year);
-            int month = _random.Next(1, 13); 
-            int day = _random.Next(1, DateTime.DaysInMonth(year, month) + 1); 
+        //private void AddAnimal(string name, string species, User user)
+        //{
+        //    int year = _random.Next(2020, DateTime.Now.Year);
+        //    int month = _random.Next(1, 13); 
+        //    int day = _random.Next(1, DateTime.DaysInMonth(year, month) + 1); 
 
-            _context.Animals.Add(new Animal
-            {
-                Name = name,
-                Species = species,
-                BirthDate = new DateTime(year, month, day),
-                Dono = user
-            }) ;
-        }
+        //    _context.Animals.Add(new Animal
+        //    {
+        //        Name = name,
+        //        Species = species,
+        //        BirthDate = new DateTime(year, month, day),
+        //        Owner = user
+        //    }) ;
+        //}
     }
 }

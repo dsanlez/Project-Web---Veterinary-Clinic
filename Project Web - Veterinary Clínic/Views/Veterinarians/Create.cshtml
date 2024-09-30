@@ -1,4 +1,4 @@
-﻿@model Project_Web___Veterinary_Clínic.Models.RegisterNewUserViewModel
+﻿@model Project_Web___Veterinary_Clínic.Models.RegisterNewVeterinarianViewModel
 @{
     ViewData["Title"] = "Register";
 }
@@ -14,49 +14,75 @@
             <div class="form-group">
                 <label asp-for="FirstName">First Name</label>
                 <input asp-for="FirstName" class="form-control" />
-                <span asp-validation-for="FirstName" class="text-warning"></span>
+                <span asp-validation-for="FirstName" class="text-danger"></span>
             </div>
 
             <div class="form-group">
                 <label asp-for="LastName">Last Name</label>
                 <input asp-for="LastName" class="form-control" />
-                <span asp-validation-for="LastName" class="text-warning"></span>
+                <span asp-validation-for="LastName" class="text-danger"></span>
             </div>
 
             <div class="form-group">
                 <label asp-for="Username">User Name</label>
                 <input asp-for="Username" class="form-control" />
-                <span asp-validation-for="Username" class="text-warning"></span>
+                <span asp-validation-for="Username" class="text-danger"></span>
             </div>
+
+            <div class="form-group">
+                <label asp-for="Specialty">Specialty</label>
+                <input asp-for="Specialty" class="form-control" />
+                <span asp-validation-for="Specialty" class="text-danger"></span>
+            </div>
+
+            @*      <div class="form-group">
+            <label asp-for="RoomId" class="control-label">Room</label>
+            <select asp-for="RoomId" class="form-control" asp-items="Model.Rooms">
+            <option value="">Select a Room</option>
+            </select>
+            <span asp-validation-for="RoomId" class="text-danger"></span>
+            </div> *@
+
+            <div class="form-group">
+                <label asp-for="RoomId" class="control-label">Room</label>
+                <ejs-combobox id="RoomId"
+                              dataSource="@Model.Rooms"
+                              placeholder="Select a Room"
+                              allowFiltering="true" 
+                              enableVirtualization="true"
+                              value="@Model.RoomId.ToString()">
+                    <e-combobox-fields value="Value" text="Text"></e-combobox-fields>
+                </ejs-combobox>
+                <span asp-validation-for="RoomId" class="text-danger"></span>
+            </div> 
 
             <div class="form-group">
                 <label asp-for="Address">Address</label>
                 <input asp-for="Address" class="form-control" />
-                <span asp-validation-for="Address" class="text-warning"></span>
+                <span asp-validation-for="Address" class="text-danger"></span>
             </div>
 
             <div class="form-group">
                 <label asp-for="PhoneNumber">Phone Number</label>
                 <input asp-for="PhoneNumber" class="form-control" />
-                <span asp-validation-for="PhoneNumber" class="text-warning"></span>
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
             </div>
 
             <div class="form-group">
                 <label asp-for="Password">Password</label>
                 <input asp-for="Password" type="password" class="form-control" />
-                <span asp-validation-for="Password" class="text-warning"></span>
+                <span asp-validation-for="Password" class="text-danger"></span>
             </div>
 
             <div class="form-group">
                 <label asp-for="Confirm">Confirm</label>
                 <input asp-for="Confirm" type="password" class="form-control" />
-                <span asp-validation-for="Confirm" class="text-warning"></span>
+                <span asp-validation-for="Confirm" class="text-danger"></span>
             </div>
 
             <div class="form-group">
                 <input type="submit" value="Register New User" class="btn btn-primary" />
             </div>
-
         </form>
     </div>
 </div>

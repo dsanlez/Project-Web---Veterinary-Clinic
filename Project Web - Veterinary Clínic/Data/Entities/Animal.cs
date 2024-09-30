@@ -15,13 +15,17 @@ namespace Project_Web___Veterinary_Clínic.Data.Entities
 
         [Required]
         [Display(Name = "Date of birth")]
+        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
+        [DataType(DataType.Date)]
         public DateTime BirthDate { get; set; }
 
         [Display(Name = "Image")]
         public string ImageUrl { get; set; }
 
         [Required]
-        public User Dono { get; set; }
+        [Display(Name = "Owner")]
+        public string OwnerId { get; set; }
+        public User Owner { get; set; }
 
         public string ImageFullPath
         {

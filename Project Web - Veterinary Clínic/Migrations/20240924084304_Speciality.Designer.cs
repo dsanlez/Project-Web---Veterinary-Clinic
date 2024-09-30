@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Project_Web___Veterinary_Clínic.Data;
 
 namespace Project_Web___Veterinary_Clínic.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240924084304_Speciality")]
+    partial class Speciality
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -160,6 +162,9 @@ namespace Project_Web___Veterinary_Clínic.Migrations
                     b.Property<DateTime>("BirthDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("DonoId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
 
@@ -167,16 +172,13 @@ namespace Project_Web___Veterinary_Clínic.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("OwnerId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("Species")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OwnerId");
+                    b.HasIndex("DonoId");
 
                     b.ToTable("Animals");
                 });
@@ -299,9 +301,6 @@ namespace Project_Web___Veterinary_Clínic.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<int?>("RoomId")
-                        .HasColumnType("int");
-
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
@@ -324,8 +323,6 @@ namespace Project_Web___Veterinary_Clínic.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
-
-                    b.HasIndex("RoomId");
 
                     b.ToTable("AspNetUsers");
                 });
@@ -383,11 +380,11 @@ namespace Project_Web___Veterinary_Clínic.Migrations
 
             modelBuilder.Entity("Project_Web___Veterinary_Clínic.Data.Entities.Animal", b =>
                 {
-                    b.HasOne("Project_Web___Veterinary_Clínic.Data.Entities.User", "Owner")
+                    b.HasOne("Project_Web___Veterinary_Clínic.Data.Entities.User", "Dono")
                         .WithMany()
-                        .HasForeignKey("OwnerId");
+                        .HasForeignKey("DonoId");
 
-                    b.Navigation("Owner");
+                    b.Navigation("Dono");
                 });
 
             modelBuilder.Entity("Project_Web___Veterinary_Clínic.Data.Entities.Appointment", b =>
@@ -419,15 +416,6 @@ namespace Project_Web___Veterinary_Clínic.Migrations
                     b.Navigation("Room");
 
                     b.Navigation("Veterinarian");
-                });
-
-            modelBuilder.Entity("Project_Web___Veterinary_Clínic.Data.Entities.User", b =>
-                {
-                    b.HasOne("Project_Web___Veterinary_Clínic.Data.Entities.Room", "Room")
-                        .WithMany()
-                        .HasForeignKey("RoomId");
-
-                    b.Navigation("Room");
                 });
 #pragma warning restore 612, 618
         }

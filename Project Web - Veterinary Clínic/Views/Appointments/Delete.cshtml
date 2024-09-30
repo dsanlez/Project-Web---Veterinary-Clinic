@@ -4,7 +4,20 @@
     ViewData["Title"] = "Delete Appointment";
 }
 
-<h1>Delete Appointment</h1>
+<h1>Delete Appointment</h1><br/>
+
+@if (TempData["DeleteNotificationErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["DeleteNotificationErrorMessage"]
+    </div>
+}
+@if (TempData["DeleteSuccessNotificationMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["DeleteSuccessNotificationMessage"]
+    </div>
+}
 
 <h3>Are you sure you want to delete this appointment?</h3>
 <div>

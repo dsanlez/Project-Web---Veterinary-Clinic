@@ -1,36 +1,10 @@
 ﻿@model IEnumerable<Project_Web___Veterinary_Clínic.Data.Entities.Appointment>
 
 @{
-    ViewData["Title"] = "Appointments";
+    ViewData["Title"] = "My Appointments";
 }
 
-<h1>Appointments</h1>
-
-@if (TempData["NotificationErrorMessage"] != null)
-{
-    <div class="alert alert-danger">
-        @TempData["NotificationErrorMessage"]
-    </div>
-}
-@if (TempData["SuccessNotificationMessage"] != null)
-{
-    <div class="alert alert-success">
-        @TempData["SuccessNotificationMessage"]
-    </div>
-}
-<div>
-    <form asp-action="SendAppointmentReminderEmails">
-        <button type="submit" class="btn btn-primary">
-            Appointment Reminder
-        </button>
-    </form>
-</div>
-
-<a asp-controller="Appointments" asp-action="SendClosureNotification" class="btn btn-danger">Notify All Customers of Closure</a>
-
-<p>
-    <a asp-action="Create" class="btn btn-primary">Create New</a>
-</p>
+<h1>My Appointments</h1>
 
 <table class="table">
     <thead>
@@ -39,17 +13,15 @@
                 @Html.DisplayNameFor(model => model.First().AppointmentDate)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Animal.Name)
+                @Html.DisplayNameFor(model => model.First().Animal.Name)
             </th>
             <th>
                 Veterinarian
             </th>
             <th>
-                Customer
+                @Html.DisplayNameFor(model => model.First().Room.Name)
             </th>
-            <th>
-                Room
-            </th>
+           
             <th></th>
         </tr>
     </thead>
@@ -67,11 +39,9 @@
                     @Html.DisplayFor(modelItem => appointment.Veterinarian.FullName)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => appointment.Animal.Owner.FullName)
-                </td>
-                <td>
                     @Html.DisplayFor(modelItem => appointment.Room.Name)
                 </td>
+               
                 <td>
                     <a asp-action="Edit" asp-route-id="@appointment.Id" class="btn btn-warning">Edit</a>
                     <a asp-action="Details" asp-route-id="@appointment.Id" class="btn btn-info">Details</a>

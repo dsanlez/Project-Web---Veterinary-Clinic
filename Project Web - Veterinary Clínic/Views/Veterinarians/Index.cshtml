@@ -3,8 +3,11 @@
 <h2>Veterinarian List</h2>
 
 <p>
-    <a asp-action="Create" class="btn btn-success">Register Veterinarian</a>
+    @* <a asp-action="Create" class="e-btn e-primary">Register Veterinarian</a> *@
+    <ejs-button id="primarybtn" cssClass="e-primary" content="Register Veterinarian" onclick="redirectToCreate()"></ejs-button>
 </p>
+
+
 
 @if (TempData["SuccessMessage"] != null)
 {
@@ -26,10 +29,16 @@
                 @Html.DisplayNameFor(model => model.Email)
             </th>
             <th>
+                @Html.DisplayNameFor(model => model.Specialty)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.Address)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.PhoneNumber)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Room)
             </th>
             <th></th>
         </tr>
@@ -48,17 +57,32 @@
                     @Html.DisplayFor(modelItem => item.Email)
                 </td>
                 <td>
+                    @Html.DisplayFor(modelItem => item.Specialty)
+                </td>
+                <td>
                     @Html.DisplayFor(modelItem => item.PhoneNumber)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Address)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning">Edit</a>
-                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info">Details</a>
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
+                    @Html.DisplayFor(modelItem => item.Room.Name)
+                </td>
+                <td>
+                    <div class="btn-group" role="group">
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning">Edit</a>
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info">Details</a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Delete</a>
+                    </div>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+<script>
+    function redirectToCreate() {
+        window.location.href = '@Url.Action("Create", "Veterinarians")'; 
+    }
+</script>
+

@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Project_Web___Veterinary_Clínic.Data;
 using Project_Web___Veterinary_Clínic.Data.Entities;
 using Project_Web___Veterinary_Clínic.Helpers;
 using Project_Web___Veterinary_Clínic.Models;
+using Syncfusion.EJ2.Spreadsheet;
 using System.Threading.Tasks;
 
 namespace Project_Web___Veterinary_Clínic.Controllers
@@ -11,11 +13,19 @@ namespace Project_Web___Veterinary_Clínic.Controllers
     {
         private readonly IUserHelper _userHelper;
         private readonly IEmailHelper _emailHelper;
+        private readonly IRoomRepository _roomRepository;
+        private readonly IImageHelper _imageHelper;
 
-        public VeterinariansController(IUserHelper userHelper, IEmailHelper emailHelper)
+        public VeterinariansController(
+            IUserHelper userHelper, 
+            IEmailHelper emailHelper, 
+            IRoomRepository roomRepository,
+            IImageHelper imageHelper)
         {
             _userHelper = userHelper;
             _emailHelper = emailHelper;
+            _roomRepository = roomRepository;
+            _imageHelper = imageHelper;
         }
         public async Task<IActionResult> Index()
         {
@@ -24,13 +34,18 @@ namespace Project_Web___Veterinary_Clínic.Controllers
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            return View();
+            var model = new RegisterNewVeterinarianViewModel
+            {
+                Rooms = await _roomRepository.GetAllRoomsAsync()
+            };
+
+            return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(RegisterNewUserViewModel model)
+        public async Task<IActionResult> Create(RegisterNewVeterinarianViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -38,6 +53,13 @@ namespace Project_Web___Veterinary_Clínic.Controllers
 
                 if (user == null)
                 {
+                    var path = string.Empty;
+
+                    if (model.AvatarFile != null && model.AvatarFile.Length > 0)
+                    {
+                        path = await _imageHelper.UploadImageAsync(model.AvatarFile, "users"); // Diretório para users
+                    }
+
                     user = new User
                     {
                         FirstName = model.FirstName,
@@ -45,7 +67,9 @@ namespace Project_Web___Veterinary_Clínic.Controllers
                         Email = model.Username,
                         UserName = model.Username,
                         Address = model.Address,
-                        PhoneNumber = model.PhoneNumber
+                        PhoneNumber = model.PhoneNumber,
+                        Specialty = model.Specialty,
+                        RoomId = model.RoomId
                     };
 
                     var result = await _userHelper.AddUserAsync(user, model.Password);
@@ -56,24 +80,23 @@ namespace Project_Web___Veterinary_Clínic.Controllers
                         return View(model);
                     }
 
-
                     await _userHelper.AddUserToRoleAsync(user, "Veterinarian");
 
-                    string myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+                    string token = await _userHelper.GeneratePasswordResetTokenAsync(user);
 
-                    string tokenLink = Url.Action("ConfirmEmail", "Account", new
+                    string resetLink = Url.Action("ResetPassword", "Account", new
                     {
-                        userId = user.Id,
-                        token = myToken
+                        user = user.Id,
+                        email = user.Email,
+                        token = token
                     }, protocol: HttpContext.Request.Scheme);
 
-                    Response response = _emailHelper.SendEmail(model.Username, "Email confirmation", $"<h1>Email confirmation</h1>" +
-                           $"To allow the user," +
-                           $"please click on this link:</br></br><a href= \"{tokenLink}\">Confirm Email</a>");
+                    Response response = _emailHelper.SendEmail(model.Username, "Set your password",
+                        $"<h1>Set your password</h1>Please set your password by clicking here: <br/><a href=\"{resetLink}\">Reset Password</a>");
 
                     if (response.IsSuccess)
                     {
-                        TempData["SuccessMessage"] = "The veterinarian has been created successfully. The confirmation instructions have been sent.";
+                        TempData["SuccessMessage"] = "The veterinarian has been created successfully. Email was sent to set the password."; 
                         return RedirectToAction("Index");
                     }
 
@@ -84,6 +107,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
                     ModelState.AddModelError(string.Empty, "This email is already registered");
                 }
             }
+            model.Rooms = await _roomRepository.GetAllRoomsAsync();
             return View(model);
         }
 
@@ -110,13 +134,17 @@ namespace Project_Web___Veterinary_Clínic.Controllers
                 return NotFound();
             }
 
-            var model = new EditUserViewModel
+            var model = new EditNewVeterinarianViewModel
             {
                 FirstName = veterinarian.FirstName,
                 LastName = veterinarian.LastName,
                 Username = veterinarian.Email,
                 Address = veterinarian.Address,
-                PhoneNumber = veterinarian.PhoneNumber
+                PhoneNumber = veterinarian.PhoneNumber,
+                Specialty = veterinarian.Specialty,
+                Rooms = await _roomRepository.GetAllRoomsAsync(),
+                RoomId = veterinarian.RoomId
+                
             };
 
             return View(model);
@@ -124,7 +152,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
 
         // POST: Edit Veterinarian
         [HttpPost]
-        public async Task<IActionResult> Edit(string id, EditUserViewModel model)
+        public async Task<IActionResult> Edit(string id, EditNewVeterinarianViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -135,12 +163,21 @@ namespace Project_Web___Veterinary_Clínic.Controllers
                     return NotFound();
                 }
 
+                if (model.RoomId == null)
+                {
+                    ModelState.AddModelError("RoomId", "Please select a room."); 
+                    model.Rooms = await _roomRepository.GetAllRoomsAsync(); 
+                    return View(model);
+                }
+
                 veterinarian.FirstName = model.FirstName;
                 veterinarian.LastName = model.LastName;
                 veterinarian.Email = model.Username;
                 veterinarian.UserName = model.Username;
                 veterinarian.Address = model.Address;
                 veterinarian.PhoneNumber = model.PhoneNumber;
+                veterinarian.Specialty = model.Specialty;
+                veterinarian.RoomId = model.RoomId;
 
                 var result = await _userHelper.UpdateUserAsync(veterinarian);
 
@@ -149,7 +186,6 @@ namespace Project_Web___Veterinary_Clínic.Controllers
                     ModelState.AddModelError(string.Empty, "The user couldn't be updated");
                     return View(model);
                 }
-
                 return RedirectToAction("Index");
             }
 
@@ -196,6 +232,12 @@ namespace Project_Web___Veterinary_Clínic.Controllers
 
             ModelState.AddModelError(string.Empty, "Failed to delete Veterinarian.");
             return View(veterinarian);
+        }
+
+        public async Task<IActionResult> VeterinariansAndSpecialties()
+        {
+            var veterinarians = await _userHelper.GetVeterinariansAsync();
+            return View(veterinarians);
         }
     }
 }

@@ -8,7 +8,6 @@ using Microsoft.Extensions.Hosting;
 using Project_Web___Veterinary_Clínic.Data;
 using Project_Web___Veterinary_Clínic.Data.Entities;
 using Project_Web___Veterinary_Clínic.Helpers;
-using Microsoft.IdentityModel.Tokens;
 
 namespace Project_Web___Veterinary_Clínic
 {
@@ -71,6 +70,8 @@ namespace Project_Web___Veterinary_Clínic
             });
 
             services.AddControllersWithViews();
+
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Mgo+DSMBMAY9C3t2UlhhQlVMfV5CQmFNYVF2R2dJfl56cVRMZVhBNQtUQF1hTX5adE1iWX1ccnxcQWFc");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

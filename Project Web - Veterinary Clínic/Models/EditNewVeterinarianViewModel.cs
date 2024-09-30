@@ -1,15 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using static Project_Web___Veterinary_Clínic.Data.Entities.User;
 
 namespace Project_Web___Veterinary_Clínic.Models
 {
-    public class RegisterNewUserViewModel
+    public class EditNewVeterinarianViewModel
     {
-
         [Required]
         [Display(Name = "First Name")]
         public string FirstName { get; set; }
@@ -23,6 +19,15 @@ namespace Project_Web___Veterinary_Clínic.Models
         public string Username { get; set; }
 
         [Required]
+        public string Specialty { get; set; }
+
+        [Required]
+        public int? RoomId { get; set; }
+
+        
+        public IEnumerable<SelectListItem> Rooms { get; set; }
+
+        [Required]
         [MaxLength(100, ErrorMessage = "The field {0} can only contain {1} characters.")]
         public string Address { get; set; }
 
@@ -30,15 +35,5 @@ namespace Project_Web___Veterinary_Clínic.Models
         [MaxLength(20, ErrorMessage = "The field {0} can only contain {1} characters.")]
         public string PhoneNumber { get; set; }
 
-        [Required]
-        [MinLength(6)]
-        public string Password { get; set; }
-
-        [Required]
-        [Compare("Password")]
-        public string Confirm { get; set; }
-
-        [Display(Name = "Profile Picture")]
-        public IFormFile AvatarFile { get; set; }
     }
 }

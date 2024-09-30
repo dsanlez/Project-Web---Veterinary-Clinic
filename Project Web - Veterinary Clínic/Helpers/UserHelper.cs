@@ -126,7 +126,7 @@ namespace Project_Web___Veterinary_Clínic.Helpers
             }).ToList();
 
         }
-        
+
         public async Task<IEnumerable<SelectListItem>> GetAllVeterinariansAsync()
         {
             var roleName = "Veterinarian";
@@ -160,19 +160,17 @@ namespace Project_Web___Veterinary_Clínic.Helpers
             // Converts the list to a selected SelectListItem
             var customerList = usersInRole.Select(user => new SelectListItem
             {
-                Text = user.FullName, 
+                Text = user.FullName + " - " + user.Email,
                 Value = user.Id.ToString()
             }).ToList();
 
             // Adds the defaults text
-            customerList.Insert(0, new SelectListItem
-            {
-                Text = "(Select a customer ...)",
-                Value = "0"
-            });
-
+            //customerList.Insert(0, new SelectListItem
+            //{
+            //    Text = "(Select a customer ...)",
+            //    Value = "0"
+            //});
             return customerList;
-
         }
 
         public async Task<IEnumerable<User>> GetCustomersAsync()
@@ -180,7 +178,7 @@ namespace Project_Web___Veterinary_Clínic.Helpers
             var roleName = "Customer";
             var usersInRole = await _userManager.GetUsersInRoleAsync(roleName);
 
-            return usersInRole; 
+            return usersInRole;
         }
 
         public async Task<IEnumerable<User>> GetVeterinariansAsync()
@@ -188,7 +186,27 @@ namespace Project_Web___Veterinary_Clínic.Helpers
             var roleName = "Veterinarian";
             var usersInRole = await _userManager.GetUsersInRoleAsync(roleName);
 
-            return usersInRole;
+            var veterinarians = await _userManager.Users
+            .Include(u => u.Room) 
+            .Where(u => usersInRole.Contains(u)) 
+            .ToListAsync();
+
+            return veterinarians;
         }
-    }
+
+        //public async Task<IEnumerable<User>> GetVeterinariansAsync()
+        //{
+        //    var roleName = "Veterinarian";
+        //    var usersInRole = await _userManager.GetUsersInRoleAsync(roleName);
+
+        //    return usersInRole;
+        //}
+
+        public async Task<User> GetVeterinarianByIdAsync(string veterinarianId)
+        {
+             return await _userManager.Users
+            .Include(u => u.Room)
+            .FirstOrDefaultAsync(u => u.Id == veterinarianId);
+        }
+    }   
 }

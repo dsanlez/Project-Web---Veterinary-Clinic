@@ -1,13 +1,11 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using static Project_Web___Veterinary_Clínic.Data.Entities.User;
 
 namespace Project_Web___Veterinary_Clínic.Models
 {
-    public class RegisterNewUserViewModel
+    public class RegisterNewVeterinarianViewModel
     {
 
         [Required]
@@ -17,6 +15,14 @@ namespace Project_Web___Veterinary_Clínic.Models
         [Required]
         [Display(Name = "Last Name")]
         public string LastName { get; set; }
+
+        [Required]
+        public string Specialty { get; set; }
+
+        [Required]
+        public int? RoomId { get; set; }
+
+        public IEnumerable<SelectListItem> Rooms { get; set; }
 
         [Required]
         [DataType(DataType.EmailAddress)]
@@ -42,3 +48,4 @@ namespace Project_Web___Veterinary_Clínic.Models
         public IFormFile AvatarFile { get; set; }
     }
 }
+

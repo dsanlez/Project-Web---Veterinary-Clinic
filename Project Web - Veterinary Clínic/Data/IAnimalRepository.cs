@@ -11,5 +11,10 @@ namespace Project_Web___Veterinary_Clínic.Data
         public IQueryable GetAllWithUser();
 
         Task<IEnumerable<SelectListItem>> GetAllAnimalsAsync();
+
+        Task<Animal> GetByAnimalIdAsync(int id);
+
+
+        Task<IEnumerable<SelectListItem>> GetAnimalsByOwnerAsync(string ownerId);
     }
 }

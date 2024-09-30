@@ -48,5 +48,6 @@ namespace Project_Web___Veterinary_Clínic.Helpers
 
         Task<IEnumerable<User>> GetVeterinariansAsync();
 
+        Task<User> GetVeterinarianByIdAsync(string veterinarianId);
     }
 }

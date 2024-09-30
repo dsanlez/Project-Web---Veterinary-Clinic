@@ -22,7 +22,7 @@
                 @Html.DisplayNameFor(model => model.BirthDate)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Dono)
+                @Html.DisplayNameFor(model => model.Owner)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.ImageUrl)
@@ -45,7 +45,7 @@
                     @Html.DisplayFor(modelItem => item.BirthDate)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Dono)
+                    @Html.DisplayFor(modelItem => item.Owner.FullName)
                 </td>
                 <td>
                     @if (!string.IsNullOrEmpty(item.ImageFullPath))

@@ -19,26 +19,58 @@ namespace Project_Web___Veterinary_Clínic.Data
 
         public IQueryable GetAllWithUser()
         {
-            return _context.Animals.Include(p => p.Dono);
+            return _context.Animals.Include(a => a.Owner);
         }
 
         public async Task<IEnumerable<SelectListItem>> GetAllAnimalsAsync()
         {
-            var animals = await GetAll().ToListAsync(); 
+            var animals = await GetAll().Include(a => a.Owner).ToListAsync(); 
 
             var animalList = animals.Select(animal => new SelectListItem
             {
-                Text = animal.Name,  
+                Text = animal.Name + " - " + animal.Owner.FullName,  
                 Value = animal.Id.ToString()
             }).ToList();
            
-            animalList.Insert(0, new SelectListItem
-            {
-                Text = "(Select an animal ...)",
-                Value = "0"
-            });
+            //animalList.Insert(0, new SelectListItem
+            //{
+            //    Text = "(Select an animal ...)",
+            //    Value = "0"
+            //});
 
             return animalList;
+        }
+
+        public async Task<Animal> GetByAnimalIdAsync(int id)
+        {
+            return await _context.Animals
+                .Include(a => a.Owner)
+                .FirstOrDefaultAsync(a => a.Id == id);
+        }
+
+        //public async Task<IEnumerable<Animal>> GetAnimalsByOwnerAsync(string ownerId)
+        //{
+
+        //    return await _context.Animals
+        //                         .Where(a => a.OwnerId == ownerId)
+        //                         .ToListAsync();
+        //}
+
+        public async Task<IEnumerable<SelectListItem>> GetAnimalsByOwnerAsync(string ownerId)
+        {
+            // Fetches the animals that belong to the given ownerId
+            var animals = await _context.Animals
+                                        .Where(a => a.OwnerId == ownerId)
+                                        .ToListAsync();
+
+            // Converts the list of animals to SelectListItem
+            var animalSelectList = animals.Select(a => new SelectListItem
+            {
+                Value = a.Id.ToString(),
+                Text = a.Name
+            }).ToList();
+
+            return animalSelectList;
         }
 
     }

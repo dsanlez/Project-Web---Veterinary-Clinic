@@ -1,0 +1,28 @@
+﻿@model IEnumerable<Project_Web___Veterinary_Clínic.Data.Entities.User>
+
+@{
+    ViewData["Title"] = "Veterinarians and Specialties";
+}
+
+<h2>Veterinarians and Specialties</h2>
+<hr />
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Specialty</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var veterinarian in Model)
+            {
+                <tr>
+                    <td>@veterinarian.FullName</td>
+                    <td>@veterinarian.Specialty</td>
+                   
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
