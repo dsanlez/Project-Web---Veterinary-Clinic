@@ -32,12 +32,6 @@ namespace Project_Web___Veterinary_Clínic.Data
                 Value = animal.Id.ToString()
             }).ToList();
            
-            //animalList.Insert(0, new SelectListItem
-            //{
-            //    Text = "(Select an animal ...)",
-            //    Value = "0"
-            //});
-
             return animalList;
         }
 
@@ -48,22 +42,11 @@ namespace Project_Web___Veterinary_Clínic.Data
                 .FirstOrDefaultAsync(a => a.Id == id);
         }
 
-        //public async Task<IEnumerable<Animal>> GetAnimalsByOwnerAsync(string ownerId)
-        //{
-
-        //    return await _context.Animals
-        //                         .Where(a => a.OwnerId == ownerId)
-        //                         .ToListAsync();
-        //}
-
         public async Task<IEnumerable<SelectListItem>> GetAnimalsByOwnerAsync(string ownerId)
         {
-            // Fetches the animals that belong to the given ownerId
             var animals = await _context.Animals
                                         .Where(a => a.OwnerId == ownerId)
                                         .ToListAsync();
-
-            // Converts the list of animals to SelectListItem
             var animalSelectList = animals.Select(a => new SelectListItem
             {
                 Value = a.Id.ToString(),
@@ -73,5 +56,11 @@ namespace Project_Web___Veterinary_Clínic.Data
             return animalSelectList;
         }
 
+        public async Task<IEnumerable<Animal>> GetAllAnimalsByCustomerIdAsync(string customerId)
+        {
+            return await _context.Animals
+                .Where(a => a.OwnerId == customerId)
+                .ToListAsync();
+        }
     }
 }

@@ -10,10 +10,14 @@ namespace Project_Web___Veterinary_Clínic.Models
         public int Id { get; set; }
 
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm }", ApplyFormatInEditMode = true)]
+        [Required]
         public DateTime Date { get; set; }
+
+        [Required]
         public int AnimalId { get; set; }
         public IEnumerable<SelectListItem> Animals { get; set; }
 
+        [Required]
         public string VeterinarianId { get; set; }
         public IEnumerable<SelectListItem> Veterinarians { get; set; }
 

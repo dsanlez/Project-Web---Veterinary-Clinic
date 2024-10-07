@@ -1,0 +1,31 @@
+﻿@model IEnumerable<AppointmentAlertsViewModel>
+
+<h2>Dashboard - Appointment Alerts</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Appointment ID</th>
+            <th>Animal</th>
+            <th>Customer</th>
+            <th>Veterinarian</th>
+            <th>Appointment Date</th>
+            <th>Status</th>
+            <th>Message</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var alert in Model)
+        {
+            <tr>
+                <td>@alert.AppointmentId</td>
+                <td>@alert.AnimalName</td>
+                <td>@alert.CustomerName</td>
+                <td>@alert.VeterinarianName</td>
+                <td>@alert.AppointmentDate.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>@alert.Status</td>
+                <td>@alert.Message</td>
+            </tr>
+        }
+    </tbody>
+</table>

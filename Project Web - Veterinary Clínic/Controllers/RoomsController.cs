@@ -3,6 +3,7 @@ using Project_Web___Veterinary_Clínic.Data.Entities;
 using Project_Web___Veterinary_Clínic.Data;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Project_Web___Veterinary_Clínic.Helpers;
 
 namespace Project_Web___Veterinary_Clínic.Controllers
 {
@@ -44,7 +45,12 @@ namespace Project_Web___Veterinary_Clínic.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             var room = await _roomRepository.GetByIdAsync(id);
-            if (room == null) return NotFound();
+
+            if (room == null)
+            {
+                return new NotFoundViewResult("RoomNotFound");
+            }
+
             return View(room);
         }
 
@@ -64,7 +70,12 @@ namespace Project_Web___Veterinary_Clínic.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var room = await _roomRepository.GetByIdAsync(id);
-            if (room == null) return NotFound();
+
+            if (room == null)
+            {
+                return new NotFoundViewResult("RoomNotFound");
+            }
+
             return View(room);
         }
 
@@ -73,7 +84,19 @@ namespace Project_Web___Veterinary_Clínic.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var room = await _roomRepository.GetByIdAsync(id);
-            if (room == null) return NotFound();
+
+            if (room == null)
+            {
+                return new NotFoundViewResult("RoomNotFound");
+            }
+
+            var hasAssociatedVeterinarians = await _roomRepository.HasAssociatedVeterinariansAsync(room.Id);
+
+            if (hasAssociatedVeterinarians)
+            {
+                ModelState.AddModelError(string.Empty, "This room has associated veterinarians. Please reassign or delete the veterinarians before deleting the room.");
+                return View(room);
+            }
 
             await _roomRepository.DeleteAsync(room);
             return RedirectToAction(nameof(Index));
@@ -83,8 +106,18 @@ namespace Project_Web___Veterinary_Clínic.Controllers
         public async Task<IActionResult> Details(int id)
         {
             var room = await _roomRepository.GetByIdAsync(id);
-            if (room == null) return NotFound();
+
+            if (room == null)
+            {
+                return new NotFoundViewResult("RoomNotFound");
+            }
+
             return View(room);
+        }
+
+        public IActionResult RoomNotFound()
+        {
+            return View();
         }
 
     }

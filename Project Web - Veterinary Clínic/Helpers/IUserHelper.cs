@@ -17,6 +17,8 @@ namespace Project_Web___Veterinary_Clínic.Helpers
 
         Task<SignInResult> LoginAsync(LoginViewModel model);
 
+        Task<SignInResult> ValidatePasswordAsync(User user, string password);
+
         Task LogoutAsync();
 
         Task<IdentityResult> UpdateUserAsync(User user);
@@ -49,5 +51,7 @@ namespace Project_Web___Veterinary_Clínic.Helpers
         Task<IEnumerable<User>> GetVeterinariansAsync();
 
         Task<User> GetVeterinarianByIdAsync(string veterinarianId);
+
+        Task<User> GetUserByPhoneNumberAsync(string phoneNumber);
     }
 }

@@ -33,7 +33,7 @@ namespace Project_Web___Veterinary_Clínic.Data
         public async Task<IEnumerable<Appointment>> GetAppointmentsByVeterinarianAsync(string veterinarianId)
         {
             return await _context.Appointments
-                .Where(a => a.VeterinarianId == veterinarianId)
+                .Where(a => a.VeterinarianId == veterinarianId).AsNoTracking()
                 .ToListAsync();
         }
 
@@ -41,6 +41,7 @@ namespace Project_Web___Veterinary_Clínic.Data
         {
             var tomorrow = DateTime.Today.AddDays(1);
             var appointments = await _context.Appointments
+                .Include(a => a.Animal.Owner)
                 .Include(a => a.Customer)
                 .Where(a => a.AppointmentDate.Date == tomorrow)
                 .ToListAsync();
@@ -50,7 +51,7 @@ namespace Project_Web___Veterinary_Clínic.Data
 
         public async Task<IEnumerable<AppointmentViewModel>> GetAppointmentsByVeterinarianAndDate(string veterinarianId, DateTime date)
         {
-            // Get appointments for the specified veterinarian on the given date
+
             var appointments = await _context.Appointments
                 .Where(a => a.VeterinarianId == veterinarianId && a.AppointmentDate.Date == date.Date)
                 .Select(a => new AppointmentViewModel
@@ -92,6 +93,28 @@ namespace Project_Web___Veterinary_Clínic.Data
             .Include(a => a.Customer)
             .Where(a => a.CustomerId == customerId)
             .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Appointment>> GetRecentAlertsForStaffAsync()
+        {
+            var recentDate = DateTime.Today; 
+
+            return await _context.Appointments
+                .Include(a => a.Customer)
+                .Include(a => a.Veterinarian)
+                .Include(a => a.Animal)
+                .Where(a => a.LastModified >= recentDate)
+                .ToListAsync();
+        }
+
+        public IEnumerable<Appointment> GetAppointmentsByAnimalId(int animalId)
+        {
+            return _context.Appointments
+                .Include(a => a.Animal)
+                .Include(a => a.Customer)
+                .Include(a => a.Veterinarian)
+                .Where(a => a.AnimalId == animalId)
+                .ToList();
         }
     }
 }

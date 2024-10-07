@@ -18,6 +18,12 @@ namespace Project_Web___Veterinary_Clínic.Data
 
         Task<IEnumerable<Appointment>> GetAppointmentsByCustomerAsync(string customerId);
 
+        Task<IEnumerable<Appointment>> GetRecentAlertsForStaffAsync();
+
+        IEnumerable<Appointment> GetAppointmentsByAnimalId(int animalId);
+
         
+
+
     }
 }

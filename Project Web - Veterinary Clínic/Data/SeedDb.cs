@@ -31,7 +31,7 @@ namespace Project_Web___Veterinary_Clínic.Data
             await _userHelper.CheckRoleAsync("Admin");
             await _userHelper.CheckRoleAsync("Veterinarian");
             await _userHelper.CheckRoleAsync("Customer");
-            //await _userHelper.CheckRoleAsync("Employee");
+           
 
             var user = await _userHelper.GetUserByEmailAsync("diogosdl25@hotmail.com");
 

@@ -21,13 +21,12 @@ namespace Project_Web___Veterinary_Clínic.Data.Entities
         [Display(Name = "Appointment Date")]
         public DateTime AppointmentDate { get; set; }
 
-        [MaxLength(500)]
-        public string Notes { get; set; }
-
         [Required]
         [MaxLength(20)]
         public string Status { get; set; } = "Scheduled";       
         public Room Room { get; set; }
         public int RoomId { get; set; }
+
+        public DateTime LastModified { get; set; }
     }
 }

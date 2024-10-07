@@ -11,6 +11,16 @@
     <!-- Syncfusion ASP.NET Core controls styles -->
     <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/27.1.48/fluent.css" />
     <!-- Syncfusion ASP.NET Core controls scripts -->
+    <style>
+        .actPage {
+            border-bottom:1px solid black;
+            font-weight: bold
+        }
+        .backgroundcolorbar
+        {
+            background-color:lightgreen
+        }
+    </style>
     <script src="https://cdn.syncfusion.com/ej2/27.1.48/dist/ej2.min.js"></script>
 </head>
 <body>
@@ -25,7 +35,7 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link  actPage text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
@@ -39,7 +49,7 @@
                         @if (this.User.Identity.IsAuthenticated && this.User.IsInRole("Customer"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Animals" asp-action="">Animals</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Animals" asp-action="GetAllAnimalsByOwner">Animals</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Appointments" asp-action="MyAppointments">Appointments</a>
@@ -52,11 +62,15 @@
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Animals" asp-action="Index">Animals</a>
                             </li>
                             <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Customers" asp-action="Index">Customers</a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Appointments" asp-action="Index">Appointments</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Customers" asp-action="Index">Customers</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Veterinarians" asp-action="Dashboard">Dashboard</a>
                             </li>
+                           
                         }
                         @if (this.User.Identity.IsAuthenticated && this.User.IsInRole("Admin"))
                         {

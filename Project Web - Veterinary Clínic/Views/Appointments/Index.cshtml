@@ -18,18 +18,20 @@
         @TempData["SuccessNotificationMessage"]
     </div>
 }
-<div>
+@* <div>
     <form asp-action="SendAppointmentReminderEmails">
         <button type="submit" class="btn btn-primary">
             Appointment Reminder
         </button>
     </form>
-</div>
+</div> *@
+
+<a asp-controller="Appointments" asp-action="SendAppointmentReminderEmails" class="btn btn-danger">Appointment Reminder</a>
 
 <a asp-controller="Appointments" asp-action="SendClosureNotification" class="btn btn-danger">Notify All Customers of Closure</a>
 
 <p>
-    <a asp-action="Create" class="btn btn-primary">Create New</a>
+    <a asp-action="Create" class="btn btn-primary">Book Appointment</a>
 </p>
 
 <table class="table">
@@ -49,6 +51,9 @@
             </th>
             <th>
                 Room
+            </th>
+            <th>
+                Status
             </th>
             <th></th>
         </tr>
@@ -73,6 +78,9 @@
                     @Html.DisplayFor(modelItem => appointment.Room.Name)
                 </td>
                 <td>
+                    @Html.DisplayFor(modelItem => appointment.Status)
+                </td>
+                <td>
                     <a asp-action="Edit" asp-route-id="@appointment.Id" class="btn btn-warning">Edit</a>
                     <a asp-action="Details" asp-route-id="@appointment.Id" class="btn btn-info">Details</a>
                     <a asp-action="Delete" asp-route-id="@appointment.Id" class="btn btn-danger">Delete</a>
@@ -80,4 +88,5 @@
             </tr>
         }
     </tbody>
+    <a asp-controller="Appointments" asp-action="StaffAppointmentsHistory" class="btn btn-danger">Appointments history</a>
 </table>

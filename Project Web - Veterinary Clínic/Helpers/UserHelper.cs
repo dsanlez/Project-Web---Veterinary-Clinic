@@ -106,6 +106,11 @@ namespace Project_Web___Veterinary_Clínic.Helpers
             return await _userManager.FindByIdAsync(userId);
         }
 
+        public async Task<SignInResult> ValidatePasswordAsync(User user, string password)
+        {
+            return await _signInManager.CheckPasswordSignInAsync(user, password, false);
+        }
+
         public async Task<string> GeneratePasswordResetTokenAsync(User user)
         {
             return await _userManager.GeneratePasswordResetTokenAsync(user);
@@ -130,22 +135,14 @@ namespace Project_Web___Veterinary_Clínic.Helpers
         public async Task<IEnumerable<SelectListItem>> GetAllVeterinariansAsync()
         {
             var roleName = "Veterinarian";
-            // Gets all the users with the role "Veterinarian"
+           
             var usersInRole = await _userManager.GetUsersInRoleAsync(roleName);
 
-            // Converts the list to a selected SelectListItem
             var veterinarianList = usersInRole.Select(user => new SelectListItem
             {
                 Text = user.FullName,
                 Value = user.Id.ToString()
             }).ToList();
-
-            // Adds the defaults text
-            veterinarianList.Insert(0, new SelectListItem
-            {
-                Text = "(Select a veterinarian ...)",
-                Value = "0"
-            });
 
             return veterinarianList;
         }
@@ -154,22 +151,14 @@ namespace Project_Web___Veterinary_Clínic.Helpers
         {
             var roleName = "Customer";
 
-            // Gets all the users with the role "Customer"
             var usersInRole = await _userManager.GetUsersInRoleAsync(roleName);
 
-            // Converts the list to a selected SelectListItem
             var customerList = usersInRole.Select(user => new SelectListItem
             {
                 Text = user.FullName + " - " + user.Email,
                 Value = user.Id.ToString()
             }).ToList();
 
-            // Adds the defaults text
-            //customerList.Insert(0, new SelectListItem
-            //{
-            //    Text = "(Select a customer ...)",
-            //    Value = "0"
-            //});
             return customerList;
         }
 
@@ -194,19 +183,19 @@ namespace Project_Web___Veterinary_Clínic.Helpers
             return veterinarians;
         }
 
-        //public async Task<IEnumerable<User>> GetVeterinariansAsync()
-        //{
-        //    var roleName = "Veterinarian";
-        //    var usersInRole = await _userManager.GetUsersInRoleAsync(roleName);
-
-        //    return usersInRole;
-        //}
-
         public async Task<User> GetVeterinarianByIdAsync(string veterinarianId)
         {
              return await _userManager.Users
             .Include(u => u.Room)
             .FirstOrDefaultAsync(u => u.Id == veterinarianId);
         }
-    }   
+
+        public async Task<User> GetUserByPhoneNumberAsync(string phoneNumber)
+        {
+            return await _userManager.Users.FirstOrDefaultAsync(u => u.PhoneNumber == phoneNumber);
+        }
+
+
+
+    }
 }

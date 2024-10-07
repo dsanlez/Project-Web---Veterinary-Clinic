@@ -16,6 +16,7 @@
 }
 
 <form asp-action="Create">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <div class="form-group">
         <label asp-for="Date"></label>
         <input asp-for="Date" class="form-control" />
@@ -31,46 +32,19 @@
         </tbody>
     </table>
     <div class="form-group">
-        <label asp-for="AnimalId">Animal</label>
-        <select asp-for="AnimalId" asp-items="Model.Animals" class="form-control"></select>
+        <label asp-for="AnimalId" class="control-label" >Animal</label>
+        <select asp-for="AnimalId" asp-items="Model.Animals" class="form-control">
+            <option value="">Select a animal</option>
+        </select>
         <span asp-validation-for="AnimalId" class="text-danger"></span>
     </div>
     <div class="form-group">
         <label asp-for="VeterinarianId">Veterinarian</label>
-        <select asp-for="VeterinarianId" asp-items="Model.Veterinarians" class="form-control"></select>
+        <select asp-for="VeterinarianId" asp-items="Model.Veterinarians" class="form-control">
+            <option value="">Select a veterinarian</option>
+        </select>
         <span asp-validation-for="VeterinarianId" class="text-danger"></span>
     </div>
-   @*  <div class="form-group">
-        <label asp-for="CustomerId">Customer</label>
-        <select asp-for="CustomerId" asp-items="Model.Customers" class="form-control"></select>
-        <span asp-validation-for="CustomerId" class="text-danger"></span>
-    </div> *@
- @*    <div class="form-group">
-        <label asp-for="RoomId">Room</label>
-        <select asp-for="RoomId" asp-items="Model.Rooms" class="form-control">
-            <option value="">Select a Room</option>
-        </select>
-        <span asp-validation-for="RoomId" class="text-danger"></span>
-    </div> *@
-
-    @*  <div class="form-group">
-        <label asp-for="RoomId">Room</label>
-        <input type="text" asp-for="RoomId" class="form-control" id="roomName" readonly />
-        <span asp-validation-for="RoomId" class="text-danger"></span>
-    </div>  *@
-
-    <table id="appointmentsTable" class="table">
-        <thead>
-            <tr>
-                <th>Slot Time</th>
-                <th>Animal</th>
-                <th>Customer</th>
-                <th>Room</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
 
     <button type="submit" class="btn btn-primary">Create</button>
 </form>
@@ -85,47 +59,6 @@
     }
 
     <script>
-        $(document).ready(function () {
-            $('#Date, #VeterinarianId').change(function () {
-                var selectedDate = $('#Date').val();
-                var veterinarianId = $('#VeterinarianId').val();
-
-                if (selectedDate && veterinarianId) {
-                    $.ajax({
-                        url: '@Url.Action("GetAvailableSlots", "Appointments")',
-                        type: 'GET',
-                        data: { date: selectedDate, veterinarianId: veterinarianId },
-                        success: function (availableSlots) {
-                            // Limpar a tabela
-                            $('#appointmentsTable tbody').empty();
-
-                            // Preencher a tabela com slots disponíveis
-                            if (availableSlots.length > 0) {
-                                availableSlots.forEach(function (slot) {
-                                    $('#appointmentsTable tbody').append(`
-                                                        <tr>
-                                                            <td>${slot}</td>
-                                                            <td>Animal Name</td>
-                                                            <td>Customer Name</td>
-                                                            <td>Room Name</td>
-                                                        </tr>
-                                                    `);
-                                });
-                            } else {
-                                $('#appointmentsTable tbody').append(`
-                                                    <tr>
-                                                        <td colspan="4">No available slots for this day.</td>
-                                                    </tr>
-                                                `);
-                            }
-                        },
-                        error: function () {
-                            alert("Error retrieving available slots. Please try again.");
-                        }
-                    });
-                }
-            });
-        });
 
         $(document).ready(function () {
             $('#Date, #VeterinarianId').change(function () {

@@ -15,5 +15,21 @@ namespace Project_Web___Veterinary_Clínic.Data
         {
 
         }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // Definir o email como único
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
+
+            // Definir o número de telefone como único
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.PhoneNumber)
+                .IsUnique();
+        }
+
     }
 }

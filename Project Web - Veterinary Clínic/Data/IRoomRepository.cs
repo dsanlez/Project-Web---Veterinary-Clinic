@@ -8,5 +8,7 @@ namespace Project_Web___Veterinary_Clínic.Data
     public interface IRoomRepository : IGenericRepository<Room>
     {
         Task<IEnumerable<SelectListItem>> GetAllRoomsAsync();
+
+        Task<bool> HasAssociatedVeterinariansAsync(int roomId);
     }
 }

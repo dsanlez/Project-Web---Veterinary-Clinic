@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Project_Web___Veterinary_Clínic.Data;
 using Project_Web___Veterinary_Clínic.Data.Entities;
 using Project_Web___Veterinary_Clínic.Helpers;
 using Project_Web___Veterinary_Clínic.Models;
 using Syncfusion.EJ2.Spreadsheet;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Project_Web___Veterinary_Clínic.Controllers
@@ -15,17 +18,24 @@ namespace Project_Web___Veterinary_Clínic.Controllers
         private readonly IEmailHelper _emailHelper;
         private readonly IRoomRepository _roomRepository;
         private readonly IImageHelper _imageHelper;
+        private readonly IAppointmentRepository _appointmentRepository;
+        private readonly IMemoryCache _memoryCache;
+        private const string AlertsCacheKey = "VeterinarianAlerts";
 
         public VeterinariansController(
             IUserHelper userHelper, 
             IEmailHelper emailHelper, 
             IRoomRepository roomRepository,
-            IImageHelper imageHelper)
+            IImageHelper imageHelper,
+            IAppointmentRepository appointmentRepository,
+            IMemoryCache memoryCache)
         {
             _userHelper = userHelper;
             _emailHelper = emailHelper;
             _roomRepository = roomRepository;
             _imageHelper = imageHelper;
+            _appointmentRepository = appointmentRepository;
+            _memoryCache = memoryCache;
         }
         public async Task<IActionResult> Index()
         {
@@ -34,6 +44,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create()
         {
             var model = new RegisterNewVeterinarianViewModel
@@ -45,6 +56,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create(RegisterNewVeterinarianViewModel model)
         {
             if (ModelState.IsValid)
@@ -53,6 +65,14 @@ namespace Project_Web___Veterinary_Clínic.Controllers
 
                 if (user == null)
                 {
+                    var existingPhoneNumberUser = await _userHelper.GetUserByPhoneNumberAsync(model.PhoneNumber);
+
+                    if (existingPhoneNumberUser != null)
+                    {
+                        ModelState.AddModelError(string.Empty, "This phone number is already registered.");
+                        return View(model);
+                    }
+
                     var path = string.Empty;
 
                     if (model.AvatarFile != null && model.AvatarFile.Length > 0)
@@ -111,13 +131,14 @@ namespace Project_Web___Veterinary_Clínic.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Details(string id)
         {
             var veterinarian = await _userHelper.GetUserByIdAsync(id);
 
             if (veterinarian == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("VeterinarianNotFound");
             }
 
             return View(veterinarian);
@@ -125,13 +146,14 @@ namespace Project_Web___Veterinary_Clínic.Controllers
 
         // GET: Edit Veterinarian
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(string id)
         {
             var veterinarian = await _userHelper.GetUserByIdAsync(id);
 
             if (veterinarian == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("VeterinarianNotFound");
             }
 
             var model = new EditNewVeterinarianViewModel
@@ -152,6 +174,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
 
         // POST: Edit Veterinarian
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(string id, EditNewVeterinarianViewModel model)
         {
             if (ModelState.IsValid)
@@ -160,7 +183,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
 
                 if (veterinarian == null)
                 {
-                    return NotFound();
+                    return new NotFoundViewResult("VeterinarianNotFound");
                 }
 
                 if (model.RoomId == null)
@@ -194,32 +217,43 @@ namespace Project_Web___Veterinary_Clínic.Controllers
 
         // GET: Delete Veterinarian
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(string id)
         {
             if (string.IsNullOrEmpty(id))
             {
-                return NotFound();
+                return new NotFoundViewResult("VeterinarianNotFound");
             }
 
             var veterinarian = await _userHelper.GetUserByIdAsync(id);
 
             if (veterinarian == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("VeterinarianNotFound");
             }
-
             return View(veterinarian);
         }
 
         // POST: Confirm Delete Veterinarian
         [HttpPost, ActionName("Delete")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var veterinarian = await _userHelper.GetUserByIdAsync(id);
 
             if (veterinarian == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("VeterinarianNotFound");
+            }
+
+            var relatedAppointments = await _appointmentRepository.GetAppointmentsByVeterinarianAsync(veterinarian.Id);
+
+            if (relatedAppointments.Any())
+            {
+
+                ModelState.AddModelError(string.Empty, "This veterinarian has associated appointments. Please delete the appointments first.");
+
+                return View(veterinarian);
             }
 
             var result = await _userHelper.DeleteUserAsync(veterinarian);
@@ -239,6 +273,46 @@ namespace Project_Web___Veterinary_Clínic.Controllers
             var veterinarians = await _userHelper.GetVeterinariansAsync();
             return View(veterinarians);
         }
+
+        public async Task<IActionResult> Dashboard()
+        {
+            // Retrieve only appointments that have been modified recently
+            var recentAppointments = await _appointmentRepository.GetRecentAlertsForStaffAsync();
+
+            // Map appointments to view models and generate alert messages
+            var alerts = recentAppointments.Select(a => new AppointmentAlertsViewModel
+            {
+                AppointmentId = a.Id,
+                AnimalName = a.Animal.Name,
+                CustomerName = a.Customer.FullName,
+                VeterinarianName = a.Veterinarian.FullName,
+                AppointmentDate = a.AppointmentDate,
+                Status = a.Status,
+                Message = GenerateAlertMessage(a)
+            }).ToList();          
+
+            return View(alerts);
+        }
+        private string GenerateAlertMessage(Appointment appointment)
+        {
+            var customerName = appointment.Customer.FullName;
+            var lastModified = appointment.LastModified.ToString("g");
+
+            return appointment.Status switch
+            {
+                "Scheduled" => $"New appointment scheduled by {customerName}. (Last modified: {lastModified})",
+                "Rescheduled" => $"Appointment with {customerName} has been Rescheduled to {appointment.AppointmentDate}. (Last modified: {lastModified})",
+                "Cancelled" => $"Appointment with {customerName} has been cancelled. (Last modified: {lastModified})",
+                _ => "Unknown status change."
+            };
+        }
+
+        public IActionResult VeterinarianNotFound()
+        {
+            return View();
+        }
+        
+
     }
 }
 

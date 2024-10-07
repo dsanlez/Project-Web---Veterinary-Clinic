@@ -25,5 +25,20 @@ namespace Project_Web___Veterinary_Clínic.Data.Entities
 
         [Display(Name = "Full Name")]
         public string FullName => $"{FirstName} {LastName}";
+
+        public string ImageFullPath
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(Avatar))
+                {
+                    return null;
+                }
+
+                return $"https://localhost:44363{Avatar.Substring(1)}";
+            }
+        }
+
     }
+
 }

@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Project_Web___Veterinary_Clínic.Data;
+using Project_Web___Veterinary_Clínic.Data.Entities;
 using Project_Web___Veterinary_Clínic.Helpers;
 using Project_Web___Veterinary_Clínic.Models;
 using System.Linq;
@@ -14,19 +16,23 @@ namespace Project_Web___Veterinary_Clínic.Controllers
         private readonly IImageHelper _imageHelper;
         private readonly IConverterHelper _converterHelper;
         public readonly IUserHelper _userHelper;
+        private readonly IAppointmentRepository _appointmentRepository;
 
         public AnimalsController(IAnimalRepository animalRepository,
             IConverterHelper converterHelper,
             IImageHelper imageHelper,
-            IUserHelper userHelper)
+            IUserHelper userHelper,
+            IAppointmentRepository appointmentRepository)
         {
             _animalRepository = animalRepository;
             _converterHelper = converterHelper;
             _imageHelper = imageHelper;
             _userHelper = userHelper;
+            _appointmentRepository = appointmentRepository;
         }
 
         // GET: Animals
+        [Authorize(Roles = "Veterinarian")]
         public IActionResult Index()
         {
             return View(_animalRepository.GetAll().OrderBy(e => e.Name)
@@ -35,6 +41,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
         }
 
         // GET: Animals/Details/5
+        [Authorize(Roles = "Veterinarian")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -53,7 +60,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
         }
 
         // GET: Animals/Create
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Veterinarian")]
         public async Task<IActionResult> Create()
         {
             var users = await _userHelper.GetAllCustomersAsync();
@@ -69,6 +76,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Veterinarian")]
         public async Task<IActionResult> Create(AnimalViewModel model)
         {
             if (ModelState.IsValid)
@@ -92,6 +100,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
         }
 
         // GET: Animals/Edit/5
+        [Authorize(Roles = "Veterinarian")]
         public async Task<IActionResult> Edit(int? id)
         {
 
@@ -120,6 +129,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
         // POST: Animals/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Veterinarian")]
         public async Task<IActionResult> Edit(AnimalViewModel model)
         {
             if (ModelState.IsValid)
@@ -158,6 +168,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
         }
 
         // GET: Animals/Delete/5
+        [Authorize(Roles = "Veterinarian")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -177,15 +188,41 @@ namespace Project_Web___Veterinary_Clínic.Controllers
 
         // POST: Animals/Delete/5
         [HttpPost, ActionName("Delete")]
+        [Authorize(Roles = "Veterinarian")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var product = await _animalRepository.GetByIdAsync(id);
-            await _animalRepository.DeleteAsync(product);
+
+            var animal = await _animalRepository.GetByIdAsync(id);
+            
+            if (animal == null)
+            {
+                return new NotFoundViewResult("AnimalNotFound");
+            }
+
+            var relatedAppointments =  _appointmentRepository.GetAppointmentsByAnimalId(animal.Id);
+
+            if (relatedAppointments.Any())
+            {
+                
+                ModelState.AddModelError(string.Empty, "This animal has associated appointments. Please delete the appointments first.");
+
+                return View(animal);
+            }
+
+            await _animalRepository.DeleteAsync(animal);
 
             return RedirectToAction(nameof(Index));
         }
 
+
+        [Authorize(Roles = "Customer")]
+        public async Task<IActionResult> GetAllAnimalsByOwner()
+        {
+            var user = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
+
+            return View( await _animalRepository.GetAllAnimalsByCustomerIdAsync(user.Id.ToString()));
+        }
         public IActionResult AnimalNotFound()
         {
             return View();

@@ -25,12 +25,6 @@ namespace Project_Web___Veterinary_Clínic.Data
                 Value = room.Id.ToString()
             }).ToList();
 
-            //roomsList.Insert(0, new SelectListItem
-            //{
-            //    Text = "(Select a room ...)",
-            //    Value = "0"
-            //});
-
             return roomsList;
         }
 
@@ -44,5 +38,11 @@ namespace Project_Web___Veterinary_Clínic.Data
                 })
                 .ToListAsync();
         }
+
+        public async Task<bool> HasAssociatedVeterinariansAsync(int roomId)
+        {
+            return await _context.Users.AnyAsync(u => u.RoomId == roomId);
+        }
+
     }
 }

@@ -6,6 +6,15 @@
 
 <h1>My Appointments</h1>
 
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+<a asp-action="CreateForCustomer" class="btn btn-primary">Book Appointment</a>
+
 <table class="table">
     <thead>
         <tr>
@@ -21,7 +30,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.First().Room.Name)
             </th>
-           
+            <th>
+                Status
+            </th>
             <th></th>
         </tr>
     </thead>
@@ -41,13 +52,19 @@
                 <td>
                     @Html.DisplayFor(modelItem => appointment.Room.Name)
                 </td>
-               
                 <td>
-                    <a asp-action="Edit" asp-route-id="@appointment.Id" class="btn btn-warning">Edit</a>
-                    <a asp-action="Details" asp-route-id="@appointment.Id" class="btn btn-info">Details</a>
-                    <a asp-action="Delete" asp-route-id="@appointment.Id" class="btn btn-danger">Delete</a>
+                    @Html.DisplayFor(modelItem => appointment.Status) 
                 </td>
+
+                <td>
+                    <a asp-action="Details" asp-route-id="@appointment.Id" class="btn btn-info">Details</a>
+                    <a asp-action="Reschedule" asp-route-id="@appointment.Id" class="btn btn-warning">Reschedule</a>
+                    <a asp-action="Cancel" asp-route-id="@appointment.Id" class="btn btn-danger">Cancel</a>
+                </td>
+
             </tr>
         }
+
+        <a asp-action="ClientAppointmentsHistory" class="btn btn-danger">History</a>
     </tbody>
 </table>

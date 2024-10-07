@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Project_Web___Veterinary_Clínic.Data.Entities;
+using Microsoft.IdentityModel.Tokens;
 using Project_Web___Veterinary_Clínic.Helpers;
-using Project_Web___Veterinary_Clínic.Migrations;
 using Project_Web___Veterinary_Clínic.Models;
+using System.IdentityModel.Tokens.Jwt;
+using System;
 using System.Linq;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Project_Web___Veterinary_Clínic.Controllers
@@ -15,14 +17,17 @@ namespace Project_Web___Veterinary_Clínic.Controllers
         private readonly IUserHelper _userHelper;
         private readonly IEmailHelper _emailHelper;
         private readonly IConfiguration _configuration;
+        private readonly IImageHelper _imageHelper;
 
         public AccountController(IUserHelper userHelper,
             IEmailHelper emailHelper,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            IImageHelper imageHelper)
         {
             _userHelper = userHelper;
             _emailHelper = emailHelper;
             _configuration = configuration;
+            _imageHelper = imageHelper;
         }
 
         [HttpGet]
@@ -37,17 +42,29 @@ namespace Project_Web___Veterinary_Clínic.Controllers
         }
 
         [HttpPost]
+
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (ModelState.IsValid)
             {
                 var result = await _userHelper.LoginAsync(model);
                 if (result.Succeeded)
+
                 {
+                    var user = await _userHelper.GetUserByEmailAsync(model.Username);
+
+                    if (user != null && await _userHelper.IsUserInRoleAsync(user, "Veterinarian"))
+                    {
+
+                        return RedirectToAction("Dashboard", "Veterinarians");
+                    }
+
                     if (this.Request.Query.Keys.Contains("ReturnUrl"))
                     {
                         return Redirect(this.Request.Query["ReturnUrl"].First());
                     }
+
+
                     return this.RedirectToAction("Index", "Home");
                 }
             }
@@ -62,85 +79,6 @@ namespace Project_Web___Veterinary_Clínic.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        //public async Task<IActionResult> Register()
-        //{
-        //    var model = new RegisterNewUserViewModel
-        //    {
-        //        Roles = await _userHelper.GetRolesSelectListAsync() 
-        //    };
-        //    return View(model);
-        //}
-
-        //[HttpPost]
-        //public async Task<IActionResult> Register(RegisterNewUserViewModel model)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        var user = await _userHelper.GetUserByEmailAsync(model.Username);
-
-        //        if (user == null)
-        //        {
-        //            user = new User
-        //            {
-        //                FirstName = model.FirstName,
-        //                LastName = model.LastName,
-        //                Email = model.Username,
-        //                UserName = model.Username,
-        //                Address = model.Address,
-        //                PhoneNumber = model.PhoneNumber
-        //            };
-
-
-        //            var result = await _userHelper.AddUserAsync(user, model.Password);
-
-        //            if (result != IdentityResult.Success)
-        //            {
-        //                ModelState.AddModelError(string.Empty, "The user couldn't be created");
-        //                return View(model);
-        //            }
-
-
-        //            if (!string.IsNullOrEmpty(model.SelectedRole))
-        //            {
-        //                await _userHelper.AddUserToRoleAsync(user, model.SelectedRole);
-        //            }
-
-
-        //            var loginViewModel = new LoginViewModel
-        //            {
-        //                Password = model.Password,
-        //                RememberMe = false,
-        //                Username = model.Username
-        //            };
-
-        //            string myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
-
-        //            string tokenLink = Url.Action("ConfirmEmail", "Account", new
-        //            {
-        //                userId = user.Id,
-        //                token = myToken,
-
-        //            }, protocol: HttpContext.Request.Scheme);
-
-
-        //            Response response = _emailHelper.SendEmail(model.Username, "Email confirmation", $"<h1>Email confirmation</h1>" +
-        //                   $"To allow the user," +
-        //                   $"please click on this link:</br></br><a href= \"{tokenLink}\">Confirm Email</a>");
-
-        //            if (response.IsSuccess)
-        //            {
-        //                //ViewBag.Message = "The instructions to grant access to your user have been sent to your email";
-        //                TempData["SuccessMessage"] = "The instructions to grant access to your user have been sent to your email";
-        //                //return View(model);
-        //                return RedirectToAction("Login", "Account");
-        //            }
-        //            ModelState.AddModelError(string.Empty, "The user couldn't be logged");
-        //        }
-        //    }
-        //    model.Roles = await _userHelper.GetRolesSelectListAsync();
-        //    return View(model);
-        //}
-
         public async Task<IActionResult> ChangeUser()
         {
             var user = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
@@ -151,8 +89,12 @@ namespace Project_Web___Veterinary_Clínic.Controllers
             {
                 model.FirstName = user.FirstName;
                 model.LastName = user.LastName;
-            }
+                model.Address = user.Address;
+                model.Phonenumber = user.PhoneNumber;
+                model.ImageFullPath = user.ImageFullPath;
 
+
+            }
             return View(model);
         }
 
@@ -167,7 +109,18 @@ namespace Project_Web___Veterinary_Clínic.Controllers
                 {
                     user.FirstName = model.FirstName;
                     user.LastName = model.LastName;
+                    user.Address = model.Address;
+                    user.PhoneNumber = model.Phonenumber;
+
+                    if (model.AvatarImage != null && model.AvatarImage.Length > 0)
+                    {
+                        var imagePath = await _imageHelper.UploadImageAsync(model.AvatarImage, "users");
+
+                        user.Avatar = imagePath;
+                    }
+
                     var response = await _userHelper.UpdateUserAsync(user);
+
                     if (response.Succeeded)
                     {
                         ViewBag.UserMessage = "User updated!";
@@ -178,7 +131,6 @@ namespace Project_Web___Veterinary_Clínic.Controllers
                     }
                 }
             }
-
             return View(model);
         }
 
@@ -218,21 +170,21 @@ namespace Project_Web___Veterinary_Clínic.Controllers
         {
             if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token))
             {
-                return NotFound();
+                return new NotFoundViewResult("UserNotFound");
             }
 
             var user = await _userHelper.GetUserByIdAsync(userId);
 
             if (user == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("UserNotFound");
             }
 
             var result = await _userHelper.ConfirmEmailAsync(user, token);
 
             if (!result.Succeeded)
             {
-                return NotFound();
+                return new NotFoundViewResult("UserNotFound");
             }
 
             return View();
@@ -283,11 +235,11 @@ namespace Project_Web___Veterinary_Clínic.Controllers
         {
             if (token == null || email == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("UserNotFound");
             }
 
             var model = new ResetPasswordViewModel
-            {         
+            {
                 Username = email,
                 Token = token
             };
@@ -300,7 +252,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
             var user = await _userHelper.GetUserByEmailAsync(model.Username);
 
             if (user != null)
-            {                
+            {
                 var result = await _userHelper.ResetPasswordAsync(user, model.Token, model.Password);
 
                 if (!result.Succeeded)
@@ -331,9 +283,6 @@ namespace Project_Web___Veterinary_Clínic.Controllers
                     ViewBag.Message = "Password successfully reset.";
                     return View();
                 }
-
-                //ViewBag.Message = "Error resetting the password";
-                //return View(model);
             }
             ViewBag.Message = "Username not found.";
             return View(model);
@@ -344,5 +293,56 @@ namespace Project_Web___Veterinary_Clínic.Controllers
         {
             return View();
         }
+
+        public IActionResult UserNotFound()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateToken([FromBody] LoginViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userHelper.GetUserByEmailAsync(model.Username);
+
+                if (user != null)
+                {
+                    var result = await _userHelper.ValidatePasswordAsync(user, model.Password);
+
+                    if (result.Succeeded)
+                    {
+                        var claims = new[]
+                        {
+                            new Claim (JwtRegisteredClaimNames.Sub, user.Email),
+                            new Claim (JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                        };
+
+                        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Tokens:Key"]));
+
+                        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+                        var token = new JwtSecurityToken(
+                            _configuration["Tokens:Issuer"],
+                            _configuration["Tokens:Audience"],
+                            claims,
+                            expires: DateTime.UtcNow.AddDays(15),
+                            signingCredentials: credentials);
+
+                        var results = new
+                        {
+                            token = new JwtSecurityTokenHandler().WriteToken(token),
+                            expiration = token.ValidTo,
+                        };
+
+                        return this.Created(string.Empty, results);
+                    }
+                }
+            }
+
+            return BadRequest();
+        }
+
+
     }
 }

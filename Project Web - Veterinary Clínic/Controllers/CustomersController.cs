@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Project_Web___Veterinary_Clínic.Data;
 using Project_Web___Veterinary_Clínic.Data.Entities;
 using Project_Web___Veterinary_Clínic.Helpers;
 using Project_Web___Veterinary_Clínic.Models;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Project_Web___Veterinary_Clínic.Controllers
@@ -12,14 +15,20 @@ namespace Project_Web___Veterinary_Clínic.Controllers
         private readonly IUserHelper _userHelper;
         private readonly IEmailHelper _emailHelper;
         private readonly IImageHelper _imageHelper;
+        private readonly IAppointmentRepository _appointmentRepository;
+        private readonly IAnimalRepository _animalRepository;
 
         public CustomersController(IUserHelper userHelper,
             IEmailHelper emailHelper,
-            IImageHelper imageHelper)
+            IImageHelper imageHelper,
+            IAppointmentRepository appointmentRepository,
+            IAnimalRepository animalRepository)
         {
             _userHelper = userHelper;
             _emailHelper = emailHelper;
             _imageHelper = imageHelper;
+            _appointmentRepository = appointmentRepository;
+            _animalRepository = animalRepository;
         }
         public async Task<IActionResult> Index()
         {
@@ -28,70 +37,14 @@ namespace Project_Web___Veterinary_Clínic.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Veterinarian")]
         public IActionResult Create()
         {
             return View();
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> Create(RegisterNewUserViewModel model)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        var user = await _userHelper.GetUserByEmailAsync(model.Username);
-
-        //        if (user == null)
-        //        {
-        //            user = new User
-        //            {
-        //                FirstName = model.FirstName,
-        //                LastName = model.LastName,
-        //                Email = model.Username,
-        //                UserName = model.Username,
-        //                Address = model.Address,
-        //                PhoneNumber = model.PhoneNumber
-        //            };
-
-        //            var result = await _userHelper.AddUserAsync(user, model.Password);
-
-        //            if (result != IdentityResult.Success)
-        //            {
-        //                ModelState.AddModelError(string.Empty, "The user couldn't be created");
-        //                return View(model);
-        //            }
-
-
-        //            await _userHelper.AddUserToRoleAsync(user, "Customer");
-
-        //            string myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
-
-        //            string tokenLink = Url.Action("ConfirmEmail", "Account", new
-        //            {
-        //                userId = user.Id,
-        //                token = myToken
-        //            }, protocol: HttpContext.Request.Scheme);
-
-        //            Response response = _emailHelper.SendEmail(model.Username, "Email confirmation", $"<h1>Email confirmation</h1>" +
-        //                   $"To allow the user," +
-        //                   $"please click on this link:</br></br><a href= \"{tokenLink}\">Confirm Email</a>");
-
-        //            if (response.IsSuccess)
-        //            {
-        //                TempData["SuccessMessage"] = "The customer has been created successfully. The confirmation instructions have been sent.";
-        //                return RedirectToAction("Index");
-        //            }
-
-        //            ModelState.AddModelError(string.Empty, "The email couldn't be sent");
-        //        }
-        //        else
-        //        {
-        //            ModelState.AddModelError(string.Empty, "This email is already registered");
-        //        }
-        //    }
-        //    return View(model);
-        //}
-
         [HttpPost]
+        [Authorize(Roles = "Veterinarian")]
         public async Task<IActionResult> Create(RegisterNewUserViewModel model)
         {
             if (ModelState.IsValid)
@@ -100,6 +53,15 @@ namespace Project_Web___Veterinary_Clínic.Controllers
 
                 if (user == null)
                 {
+
+                    var existingPhoneNumberUser = await _userHelper.GetUserByPhoneNumberAsync(model.PhoneNumber);
+
+                    if (existingPhoneNumberUser != null)
+                    {
+                        ModelState.AddModelError(string.Empty, "This phone number is already registered.");
+                        return View(model);
+                    }
+
                     var path = string.Empty;
 
                     if (model.AvatarFile != null && model.AvatarFile.Length > 0)
@@ -160,17 +122,18 @@ namespace Project_Web___Veterinary_Clínic.Controllers
 
 
         [HttpGet]
+        [Authorize(Roles = "Veterinarian")]
         public async Task<IActionResult> Details(string id)
         {
             if (string.IsNullOrEmpty(id))
             {
-                return NotFound();
+                return new NotFoundViewResult("CustomerNotFound");
             }
 
             var customer = await _userHelper.GetUserByIdAsync(id);
             if (customer == null || !await _userHelper.IsUserInRoleAsync(customer, "Customer"))
             {
-                return NotFound();
+                return new NotFoundViewResult("CustomerNotFound");
             }
 
             var model = new RegisterNewUserViewModel
@@ -186,17 +149,18 @@ namespace Project_Web___Veterinary_Clínic.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Veterinarian")]
         public async Task<IActionResult> Edit(string id)
         {
             if (string.IsNullOrEmpty(id))
             {
-                return NotFound();
+                return new NotFoundViewResult("CustomerNotFound");
             }
 
             var customer = await _userHelper.GetUserByIdAsync(id);
             if (customer == null || !await _userHelper.IsUserInRoleAsync(customer, "Customer"))
             {
-                return NotFound();
+                return new NotFoundViewResult("CustomerNotFound");
             }
 
             var model = new EditUserViewModel
@@ -212,6 +176,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Veterinarian")]
         public async Task<IActionResult> Edit(string id, EditUserViewModel model)
         {
             if (ModelState.IsValid)
@@ -219,7 +184,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
                 var customer = await _userHelper.GetUserByIdAsync(id);
                 if (customer == null)
                 {
-                    return NotFound();
+                    return new NotFoundViewResult("CustomerNotFound");
                 }
 
                 customer.FirstName = model.FirstName;
@@ -243,30 +208,50 @@ namespace Project_Web___Veterinary_Clínic.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Veterinarian")]
         public async Task<IActionResult> Delete(string id)
         {
             if (string.IsNullOrEmpty(id))
             {
-                return NotFound();
+                return new NotFoundViewResult("CustomerNotFound");
             }
 
             var customer = await _userHelper.GetUserByIdAsync(id);
 
             if (customer == null )
             {
-                return NotFound();
+                return new NotFoundViewResult("CustomerNotFound");
             }
             return View(customer);
         }
 
         [HttpPost, ActionName("Delete")]
+        [Authorize(Roles = "Veterinarian")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             var customer = await _userHelper.GetUserByIdAsync(id);
 
             if (customer == null)
             {
-                return NotFound();
+                return new NotFoundViewResult("CustomerNotFound");
+            }
+
+            var relatedAppointments = await _appointmentRepository.GetAppointmentsByCustomerAsync(customer.Id);
+
+            if (relatedAppointments.Any())
+            {
+
+                ModelState.AddModelError(string.Empty, "This Customer has associated appointments. Please delete the appointments first.");
+
+                return View(customer);
+            }
+
+            var relatedAnimals = await _animalRepository.GetAnimalsByOwnerAsync(customer.Id);
+
+            if (relatedAnimals.Any())
+            {
+                ModelState.AddModelError(string.Empty, "This customer has registered animals. Please delete or reassign the animals before deleting the customer.");
+                return View(customer);
             }
 
             var result = await _userHelper.DeleteUserAsync(customer);
@@ -279,6 +264,10 @@ namespace Project_Web___Veterinary_Clínic.Controllers
 
             ModelState.AddModelError(string.Empty, "Failed to delete customer.");
             return View(customer);
+        }
+        public IActionResult CustomerNotFound()
+        {
+            return View();
         }
     }
 }

@@ -1,0 +1,111 @@
+﻿@model Project_Web___Veterinary_Clínic.Models.AppointmentViewModel
+
+@{
+    ViewData["Title"] = "CreateForCustomer";
+}
+
+<h1>Book Appointment</h1>
+
+
+@if (TempData["AppointmentError"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["AppointmentError"]
+    </div>
+}
+@if (TempData["SuccessAppointment"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessAppointment"]
+    </div>
+}
+
+        <form asp-action="CreateForCustomer">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="Date"></label>
+                <input asp-for="Date" class="form-control" />
+                <span asp-validation-for="Date" class="text-danger"></span>
+            </div>
+
+            <table id="appointmentsTable2" class="table">
+                <thead>
+                    <tr>
+                        <th>Slot Available</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+
+            <div class="form-group">
+        <label asp-for="AnimalId" class="control-label">Animal</label>
+                <select asp-for="AnimalId" class="form-control" asp-items="Model.Animals">
+                    <option value="">Select a animal</option>
+                </select>
+                <span asp-validation-for="AnimalId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+        <label asp-for="VeterinarianId" class="control-label">Veterinarian</label>
+                <select asp-for="VeterinarianId" class="form-control" asp-items="Model.Veterinarians">
+                    <option value="">Select a veterinarian</option>
+                </select>
+                <span asp-validation-for="VeterinarianId" class="text-danger"></span>
+            </div>
+           
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+
+<div>
+    <a asp-action="MyAppointments" class="btn btn-success">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+
+        $(document).ready(function () {
+            $('#Date, #VeterinarianId').change(function () {
+                var selectedDate = $('#Date').val();
+                var veterinarianId = $('#VeterinarianId').val();
+
+                if (selectedDate && veterinarianId) {
+                    $.ajax({
+                        url: '@Url.Action("GetAvailableSlots", "Appointments")',
+                        type: 'GET',
+                        data: { date: selectedDate, veterinarianId: veterinarianId },
+                        success: function (availableSlots) {
+
+                            $('#appointmentsTable2 tbody').empty();
+
+                            if (availableSlots.length > 0) {
+                                $('#appointmentsTable2 tbody').append(`<tr><td>`);
+                                availableSlots.forEach(function (slot) {
+                                    $('#appointmentsTable2 tbody').append(`${slot}, `);
+                                });
+                                $('#appointmentsTable2 tbody').append(`</tr></td>`);
+                            } else {
+                                $('#appointmentsTable2 tbody').append(`
+                                                                    <tr>
+                                                                        <td colspan="4">No available slots for this day.</td>
+                                                                    </tr>
+                                                                `);
+                            }
+                        },
+                        error: function () {
+                            alert("Error retrieving available slots. Please try again.");
+                        }
+                    });
+                }
+            });
+        });
+
+    </script>
+}
+

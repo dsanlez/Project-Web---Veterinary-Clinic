@@ -5,9 +5,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Project_Web___Veterinary_Clínic.Data;
 using Project_Web___Veterinary_Clínic.Data.Entities;
 using Project_Web___Veterinary_Clínic.Helpers;
+using System.Text;
 
 namespace Project_Web___Veterinary_Clínic
 {
@@ -40,6 +42,19 @@ namespace Project_Web___Veterinary_Clínic
 
              .AddDefaultTokenProviders()
             .AddEntityFrameworkStores<DataContext>();
+
+            services.AddAuthentication()
+                .AddCookie()
+                .AddJwtBearer(cfg =>
+                {
+                    cfg.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidIssuer = this.Configuration["Tokens:Issuer"],
+                        ValidAudience = this.Configuration["Tokens:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(this.Configuration["Tokens:Key"]))
+                    };
+                });
 
             services.AddDbContext<DataContext>(cfg =>
             {

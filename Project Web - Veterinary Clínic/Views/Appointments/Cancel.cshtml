@@ -1,0 +1,48 @@
+﻿@model Project_Web___Veterinary_Clínic.Models.AppointmentViewModel
+
+<h2>Cancel Appointment</h2>
+
+<p>Are you sure you want to cancel the following appointment?</p>
+
+<div>
+    <h4>Appointment Details</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Date)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Date)
+        </dd>
+        <dt class="col-sm-2">
+            Animal
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Animals.FirstOrDefault(a => a.Value == Model.AnimalId.ToString())?.Text
+        </dd>
+        <dt class="col-sm-2">
+            Veterinarian
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Veterinarians.FirstOrDefault(v => v.Value == Model.VeterinarianId.ToString())?.Text
+        </dd>
+        <dt class="col-sm-2">
+            Customer
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Customers.FirstOrDefault(c => c.Value == Model.CustomerId.ToString())?.Text
+        </dd>
+        <dt class="col-sm-2">
+            Room
+        </dt>
+        <dd class="col-sm-10">
+            @Model.Rooms.FirstOrDefault(r => r.Value == Model.RoomId.ToString())?.Text
+        </dd>
+    </dl>
+
+<form asp-action="Cancel" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Confirm Cancel</button>
+    <a asp-action="MyAppointments" class="btn btn-secondary">Go Back</a>
+</form>
+</div>

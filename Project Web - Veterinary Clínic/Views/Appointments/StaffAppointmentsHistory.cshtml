@@ -1,0 +1,26 @@
+﻿@model IEnumerable<Project_Web___Veterinary_Clínic.Data.Entities.Appointment>
+
+<h2>Histórico de Consultas</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Data</th>
+            <th>Veterinário</th>
+            <th>Animal</th>
+           
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var appointment in Model)
+        {
+            <tr>
+                <td>@appointment.AppointmentDate.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>@appointment.Veterinarian.FullName</td>
+                <td>@appointment.Animal.Name</td> 
+               
+               
+            </tr>
+        }
+    </tbody>
+</table>

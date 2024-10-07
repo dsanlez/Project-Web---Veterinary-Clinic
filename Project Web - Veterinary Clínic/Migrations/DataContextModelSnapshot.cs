@@ -168,6 +168,7 @@ namespace Project_Web___Veterinary_Clínic.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("OwnerId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Species")
@@ -197,9 +198,8 @@ namespace Project_Web___Veterinary_Clínic.Migrations
                     b.Property<string>("CustomerId")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Notes")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                    b.Property<DateTime>("LastModified")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("RoomId")
                         .HasColumnType("int");
@@ -294,7 +294,7 @@ namespace Project_Web___Veterinary_Clínic.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
@@ -317,6 +317,10 @@ namespace Project_Web___Veterinary_Clínic.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Email")
+                        .IsUnique()
+                        .HasFilter("[Email] IS NOT NULL");
+
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
 
@@ -324,6 +328,10 @@ namespace Project_Web___Veterinary_Clínic.Migrations
                         .IsUnique()
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.HasIndex("PhoneNumber")
+                        .IsUnique()
+                        .HasFilter("[PhoneNumber] IS NOT NULL");
 
                     b.HasIndex("RoomId");
 
@@ -385,7 +393,9 @@ namespace Project_Web___Veterinary_Clínic.Migrations
                 {
                     b.HasOne("Project_Web___Veterinary_Clínic.Data.Entities.User", "Owner")
                         .WithMany()
-                        .HasForeignKey("OwnerId");
+                        .HasForeignKey("OwnerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Owner");
                 });

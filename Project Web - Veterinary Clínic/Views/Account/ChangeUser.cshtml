@@ -7,7 +7,7 @@
 
 <div class="row">
     <div class="col-md-4 offset-md-4">
-        <form method="post">
+        <form method="post" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly"></div>
 
             <div class="form-group">
@@ -20,6 +20,29 @@
                 <label asp-for="LastName">Last Name</label>
                 <input asp-for="LastName" class="form-control" />
                 <span asp-validation-for="LastName" class="text-warning"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Address">Adress</label>
+                <input asp-for="Address" class="form-control" />
+                <span asp-validation-for="Address" class="text-warning"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Phonenumber">Phone Number</label>
+                <input asp-for="Phonenumber" class="form-control" />
+                <span asp-validation-for="Phonenumber" class="text-warning"></span>
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.ImageFullPath))
+            {
+                <div class="form-group">
+                    <label>Current Profile Picture:</label><br />
+                    <img src="@Model.ImageFullPath" alt="Profile Picture" style="width:150px;height:150px;border-radius:50%;" />
+                </div>
+            }
+            <div class="form-group">
+                <label asp-for="AvatarImage" class="control-label"></label>
+                <input asp-for="AvatarImage" type="file" class="form-control" />
+                <span asp-validation-for="AvatarImage" class="text-danger"></span>
             </div>
 
             <div class="form-group">
