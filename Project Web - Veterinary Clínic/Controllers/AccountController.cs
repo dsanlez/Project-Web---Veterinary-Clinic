@@ -9,6 +9,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Project_Web___Veterinary_Clínic.Controllers
 {
@@ -79,6 +80,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+        [Authorize(Roles = "Veterinarian, Customer, Admin")]
         public async Task<IActionResult> ChangeUser()
         {
             var user = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
@@ -287,8 +289,6 @@ namespace Project_Web___Veterinary_Clínic.Controllers
             ViewBag.Message = "Username not found.";
             return View(model);
         }
-
-
         public IActionResult NotAuthorized()
         {
             return View();

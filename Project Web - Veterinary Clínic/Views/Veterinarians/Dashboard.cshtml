@@ -5,11 +5,11 @@
 <table class="table">
     <thead>
         <tr>
-            <th>Appointment ID</th>
             <th>Animal</th>
             <th>Customer</th>
             <th>Veterinarian</th>
             <th>Appointment Date</th>
+            <th>Time</th>
             <th>Status</th>
             <th>Message</th>
         </tr>
@@ -18,11 +18,11 @@
         @foreach (var alert in Model)
         {
             <tr>
-                <td>@alert.AppointmentId</td>
                 <td>@alert.AnimalName</td>
                 <td>@alert.CustomerName</td>
                 <td>@alert.VeterinarianName</td>
-                <td>@alert.AppointmentDate.ToString("dd/MM/yyyy HH:mm")</td>
+                <td>@alert.AppointmentDate.ToString("dd/MM/yyyy")</td>
+                <td>@alert.Time</td>
                 <td>@alert.Status</td>
                 <td>@alert.Message</td>
             </tr>

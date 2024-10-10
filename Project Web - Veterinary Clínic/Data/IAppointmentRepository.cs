@@ -22,6 +22,8 @@ namespace Project_Web___Veterinary_Clínic.Data
 
         IEnumerable<Appointment> GetAppointmentsByAnimalId(int animalId);
 
+
+
         
 
 

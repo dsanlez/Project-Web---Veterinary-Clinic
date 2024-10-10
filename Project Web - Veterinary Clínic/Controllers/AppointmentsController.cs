@@ -1,16 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Project_Web___Veterinary_Clínic.Data;
 using Project_Web___Veterinary_Clínic.Data.Entities;
 using Project_Web___Veterinary_Clínic.Helpers;
-using Project_Web___Veterinary_Clínic.Migrations;
 using Project_Web___Veterinary_Clínic.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Xml;
 
 namespace Project_Web___Veterinary_Clínic.Controllers
 {
@@ -37,23 +34,23 @@ namespace Project_Web___Veterinary_Clínic.Controllers
             _emailHelper = emailHelper;
 
         }
-        // Display all appointments
         public async Task<IActionResult> Index()
         {
             var appointments = (await _appointmentRepository.GetAllWithUsersAsync())
-               .Where(a => a.AppointmentDate >= DateTime.Now) 
+               .Where(a => a.AppointmentDate >= DateTime.Now)
                .OrderBy(ord => ord.AppointmentDate);
 
             return View(appointments);
 
         }
-        // Render the form to create a new appointment
+
         [HttpGet]
+        [Authorize(Roles = "Veterinarian")]
         public async Task<IActionResult> Create()
         {
             var animals = await _animalRepository.GetAllAnimalsAsync();
             var veterinarians = await _userHelper.GetAllVeterinariansAsync();
-            var customers = await _userHelper.GetAllCustomersAsync();
+            //var customers = await _userHelper.GetAllCustomersAsync();
 
             var model = new AppointmentViewModel
             {
@@ -67,8 +64,8 @@ namespace Project_Web___Veterinary_Clínic.Controllers
             return View(model);
         }
 
-        // Handle form submission to create a new appointment
         [HttpPost]
+        [Authorize(Roles = "Veterinarian")]
         public async Task<IActionResult> Create(AppointmentViewModel model)
         {
             if (ModelState.IsValid)
@@ -87,20 +84,21 @@ namespace Project_Web___Veterinary_Clínic.Controllers
                 }
                 var existingAppointments = await _appointmentRepository.GetAppointmentsByVeterinarianAsync(model.VeterinarianId);
 
-                var startTime = model.Date;
-                var endTime = startTime.AddMinutes(30);
+                //var startTime = model.Date.AddMinutes(Convert.ToDouble(model.Time.Split(":")[0])*60).AddMinutes(Convert.ToDouble(model.Time.Split(":")[1]));
+                //var endTime = startTime.AddMinutes(30);
 
-                bool isConflict = existingAppointments.Any(a =>
-                    (a.AppointmentDate < endTime && a.AppointmentDate.AddMinutes(30) > startTime));
+                //bool isConflict = existingAppointments.Any(a =>
+                //    (a.AppointmentDate < endTime && a.AppointmentDate.AddMinutes(30) > startTime));
 
-                if (isConflict)
-                {
-                    TempData["AppointmentError"] = "The appointment cannot be scheduled at this time because there is already an appointment booked.";
+                //if (isConflict)
+                //{
+                //    TempData["AppointmentError"] = "The appointment cannot be scheduled at this time because there is already an appointment booked.";
 
-                    model.Animals = (await _animalRepository.GetAllAnimalsAsync()).ToList();
-                    model.Veterinarians = (await _userHelper.GetAllVeterinariansAsync()).ToList();
-                    return View(model);
-                }
+                //    model.Animals = (await _animalRepository.GetAllAnimalsAsync()).ToList();
+                //    model.Veterinarians = (await _userHelper.GetAllVeterinariansAsync()).ToList();
+                //    return View(model);
+                //}
+
                 var veterinarian = await _userHelper.GetVeterinarianByIdAsync(model.VeterinarianId);
 
                 model.RoomId = veterinarian.Room.Id;
@@ -116,6 +114,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
                     Status = "Scheduled",
                     LastModified = DateTime.Now,
                     CustomerId = animal.Owner.Id,
+                    Time = model.Time
                 };
 
                 await _appointmentRepository.CreateAsync(appointment);
@@ -128,6 +127,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = "Veterinarian")]
         public async Task<IActionResult> Edit(int id)
         {
             var appointment = await _appointmentRepository.GetByIdAsync(id);
@@ -140,7 +140,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
             var animals = await _animalRepository.GetAllAnimalsAsync();
             var veterinarians = await _userHelper.GetAllVeterinariansAsync();
             var customers = await _userHelper.GetAllCustomersAsync();
-            var rooms = await _roomRepository.GetAllRoomsAsync();
+            //var rooms = await _roomRepository.GetAllRoomsAsync();
 
             var model = new AppointmentViewModel
             {
@@ -150,21 +150,19 @@ namespace Project_Web___Veterinary_Clínic.Controllers
                 VeterinarianId = appointment.VeterinarianId,
                 CustomerId = appointment.CustomerId,
                 RoomId = appointment.RoomId,
+                Time = appointment.Time,
 
                 Animals = animals.ToList(),
-
                 Veterinarians = veterinarians.ToList(),
-
                 Customers = customers.ToList(),
 
-                Rooms = rooms.ToList(),
+                //Rooms = rooms.ToList(),
             };
-
             return View(model);
         }
 
-        // Handle form submission to update an existing appointment
         [HttpPost]
+        [Authorize(Roles = "Veterinarian")]
         public async Task<IActionResult> Edit(AppointmentViewModel model)
         {
             if (ModelState.IsValid)
@@ -181,24 +179,31 @@ namespace Project_Web___Veterinary_Clínic.Controllers
                     return View(model);
                 }
                 var existingAppointments = await _appointmentRepository.GetAppointmentsByVeterinarianAsync(model.VeterinarianId);
-                var startTime = model.Date;
-                var endTime = startTime.AddMinutes(30);
 
-                bool isConflict = existingAppointments.Any(a =>
-                    (a.AppointmentDate < endTime && a.AppointmentDate.AddMinutes(30) > startTime));
+                //var startTime = model.Date;
+                //var endTime = startTime.AddMinutes(30);
 
-                if (isConflict)
-                {
-                    TempData["NotificationErrorMessage"] = "The appointment cannot be scheduled at this time because there is already an appointment booked.";
+                //bool isConflict = existingAppointments.Any(a =>
+                //    (a.AppointmentDate < endTime && a.AppointmentDate.AddMinutes(30) > startTime));
+
+                //if (isConflict)
+                //{
+                //    TempData["NotificationErrorMessage"] = "The appointment cannot be scheduled at this time because there is already an appointment booked.";
 
 
-                    model.Animals = (await _animalRepository.GetAllAnimalsAsync()).ToList();
-                    model.Veterinarians = (await _userHelper.GetAllVeterinariansAsync()).ToList();
-                    model.Customers = (await _userHelper.GetAllCustomersAsync()).ToList();
-                    model.Rooms = (await _roomRepository.GetAllRoomsAsync()).ToList();
+                //    model.Animals = (await _animalRepository.GetAllAnimalsAsync()).ToList();
+                //    model.Veterinarians = (await _userHelper.GetAllVeterinariansAsync()).ToList();
+                //    model.Customers = (await _userHelper.GetAllCustomersAsync()).ToList();
+                //    model.Rooms = (await _roomRepository.GetAllRoomsAsync()).ToList();
 
-                    return View(model);
-                }
+                //    return View(model);
+                //}
+
+                var veterinarian = await _userHelper.GetVeterinarianByIdAsync(model.VeterinarianId);
+
+                model.RoomId = veterinarian.Room.Id;
+
+                var animal = await _animalRepository.GetByAnimalIdAsync(model.AnimalId);
 
                 var appointment = await _appointmentRepository.GetByIdAsync(model.Id);
 
@@ -210,10 +215,11 @@ namespace Project_Web___Veterinary_Clínic.Controllers
                 appointment.AppointmentDate = model.Date;
                 appointment.AnimalId = model.AnimalId;
                 appointment.VeterinarianId = model.VeterinarianId;
-                appointment.CustomerId = model.CustomerId;
+                appointment.CustomerId = animal.Owner.Id;
                 appointment.RoomId = model.RoomId;
                 appointment.Status = "Rescheduled";
                 appointment.LastModified = DateTime.Now;
+                appointment.Time = model.Time;
 
                 await _appointmentRepository.UpdateAsync(appointment);
                 TempData["SuccessNotificationMessage"] = "Appointment updated successfully!";
@@ -227,6 +233,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = "Veterinarian")]
         public async Task<IActionResult> Details(int id)
         {
             var appointment = await _appointmentRepository.GetByIdAsync(id);
@@ -249,6 +256,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
                 VeterinarianId = appointment.VeterinarianId,
                 CustomerId = appointment.CustomerId,
                 RoomId = appointment.RoomId,
+                Time = appointment.Time,
 
                 Animals = animals.ToList(),
 
@@ -261,6 +269,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = "Veterinarian")]
         public async Task<IActionResult> Delete(int id)
         {
             var appointment = await _appointmentRepository.GetByIdAsync(id);
@@ -283,6 +292,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
                 VeterinarianId = appointment.VeterinarianId,
                 CustomerId = appointment.CustomerId,
                 RoomId = appointment.RoomId,
+                Time = appointment.Time,
 
                 Animals = animals.ToList(),
 
@@ -295,8 +305,8 @@ namespace Project_Web___Veterinary_Clínic.Controllers
             return View(model);
         }
 
-        // Handle the deletion of an appointment
         [HttpPost]
+        [Authorize(Roles = "Veterinarian")]
         [ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
@@ -372,7 +382,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
             {
                 var customerEmail = appointment.Animal.Owner.Email;
                 var subject = "Appointment Reminder";
-                var body = $"Dear {appointment.Animal.Owner.FullName},\n\nThis is a reminder for your appointment tomorrow at {appointment.AppointmentDate:HH:mm}.";
+                var body = $"Dear {appointment.Animal.Owner.FullName},\n\nThis is a reminder for your appointment tomorrow at {appointment.Time}.";
 
                 // Send email using the EmailHelper
                 var response = _emailHelper.SendEmail(customerEmail, subject, body);
@@ -388,7 +398,6 @@ namespace Project_Web___Veterinary_Clínic.Controllers
 
         public async Task<IActionResult> GetAvailableSlots(DateTime date, string veterinarianId)
         {
-            // List to store available time slots
             List<string> availableSlots = new List<string>();
 
             if (veterinarianId == "0")
@@ -396,28 +405,25 @@ namespace Project_Web___Veterinary_Clínic.Controllers
                 return Json(availableSlots);
             }
 
-            // Retrieve appointments for the specified veterinarian on the given date
             var appointments = await _appointmentRepository.GetAppointmentsByVeterinarianAndDate(veterinarianId, date);
 
-            // Define the duration of each time slot and the clinic's operating hours
-            TimeSpan slotDuration = TimeSpan.FromMinutes(30);// Duration of each appointment slot
-            TimeSpan clinicOpeningTime = new TimeSpan(9, 0, 0); // 9:00 AM
-            TimeSpan clinicClosingTime = new TimeSpan(17, 0, 0); // 5:00 PM
+            TimeSpan slotDuration = TimeSpan.FromMinutes(30);
+            TimeSpan clinicOpeningTime = new TimeSpan(9, 0, 0);
+            TimeSpan clinicClosingTime = new TimeSpan(17, 0, 0);
 
             // Create a list of all possible time slots within the clinic's operating hours
             for (TimeSpan time = clinicOpeningTime; time < clinicClosingTime; time += slotDuration)
             {
-                // Check if the current time slot is occupied by any appointment
-                bool isOccupied = appointments.Any(a => a.Date.TimeOfDay == time);
+                //bool isOccupied = appointments.Any(a => a.Date.TimeOfDay == time );
 
-                // If the time slot is not occupied, add it to the list of available slots
+                bool isOccupied = appointments.Any(a =>
+                 a.Time == time.ToString(@"hh\:mm"));
+
                 if (!isOccupied)
                 {
-                    // Format the time as hh:mm and add to the available slots list
                     availableSlots.Add(time.ToString(@"hh\:mm"));
                 }
             }
-            // Return the list of available slots as a JSON response
             return Json(availableSlots);
         }
 
@@ -485,21 +491,21 @@ namespace Project_Web___Veterinary_Clínic.Controllers
                     return View(model);
                 }
 
-                var existingAppointments = await _appointmentRepository.GetAppointmentsByVeterinarianAsync(model.VeterinarianId);
-                var startTime = model.Date;
-                var endTime = startTime.AddMinutes(30);
+                //var existingAppointments = await _appointmentRepository.GetAppointmentsByVeterinarianAsync(model.VeterinarianId);
+                //var startTime = model.Date;
+                //var endTime = startTime.AddMinutes(30);
 
-                bool isConflict = existingAppointments.Any(a =>
-                    (a.AppointmentDate < endTime && a.AppointmentDate.AddMinutes(30) > startTime));
+                //bool isConflict = existingAppointments.Any(a =>
+                //    (a.AppointmentDate < endTime && a.AppointmentDate.AddMinutes(30) > startTime));
 
-                if (isConflict)
-                {
-                    TempData["AppointmentError"] = "The appointment cannot be scheduled because there is already an appointment booked.";
+                //if (isConflict)
+                //{
+                //    TempData["AppointmentError"] = "The appointment cannot be scheduled because there is already an appointment booked.";
 
-                    model.Animals = await _animalRepository.GetAnimalsByOwnerAsync(user.Id);
-                    model.Veterinarians = (await _userHelper.GetAllVeterinariansAsync()).ToList();
-                    return View(model);
-                }
+                //    model.Animals = await _animalRepository.GetAnimalsByOwnerAsync(user.Id);
+                //    model.Veterinarians = (await _userHelper.GetAllVeterinariansAsync()).ToList();
+                //    return View(model);
+                //}
 
                 var veterinarian = await _userHelper.GetVeterinarianByIdAsync(model.VeterinarianId);
                 model.RoomId = veterinarian.Room.Id;
@@ -513,9 +519,12 @@ namespace Project_Web___Veterinary_Clínic.Controllers
                     RoomId = model.RoomId,
                     LastModified = DateTime.Now,
                     Status = "Scheduled",
+                    Time = model.Time,
                 };
                 await _appointmentRepository.CreateAsync(appointment);
+
                 TempData["SuccessAppointment"] = "Appointment created successfully!";
+
                 return RedirectToAction("CreateForCustomer");
             }
             model.Animals = await _animalRepository.GetAnimalsByOwnerAsync(this.User.Identity.Name);
@@ -584,27 +593,28 @@ namespace Project_Web___Veterinary_Clínic.Controllers
 
                 var existingAppointments = await _appointmentRepository.GetAppointmentsByVeterinarianAsync(model.VeterinarianId);
 
-                var startTime = model.Date;
-                var endTime = startTime.AddMinutes(30);
+                //var startTime = model.Date;
+                //var endTime = startTime.AddMinutes(30);
 
-                bool isConflict = existingAppointments.Any(a =>
-                    a.Id != id &&
-                    (a.AppointmentDate < endTime && a.AppointmentDate.AddMinutes(30) > startTime));
+                //bool isConflict = existingAppointments.Any(a =>
+                //    a.Id != id &&
+                //    (a.AppointmentDate < endTime && a.AppointmentDate.AddMinutes(30) > startTime));
 
-                if (isConflict)
-                {
-                    TempData["AppointmentError"] = "The appointment cannot be rescheduled because there is already an appointment booked for the selected time.";
+                //if (isConflict)
+                //{
+                //    TempData["AppointmentError"] = "The appointment cannot be rescheduled because there is already an appointment booked for the selected time.";
 
-                    model.Animals = await _animalRepository.GetAnimalsByOwnerAsync(user.Id);
-                    model.Veterinarians = (await _userHelper.GetAllVeterinariansAsync()).ToList();
+                //    model.Animals = await _animalRepository.GetAnimalsByOwnerAsync(user.Id);
+                //    model.Veterinarians = (await _userHelper.GetAllVeterinariansAsync()).ToList();
 
-                    return View(model);
-                }
+                //    return View(model);
+                //}
 
                 appointment.AppointmentDate = model.Date;
                 appointment.VeterinarianId = model.VeterinarianId;
                 appointment.Status = "Rescheduled";
                 appointment.LastModified = DateTime.Now;
+                appointment.Time = model.Time;
 
                 await _appointmentRepository.UpdateAsync(appointment);
 

@@ -4,7 +4,7 @@
     ViewData["Title"] = "Appointments";
 }
 
-<h1>Appointments</h1>
+<h1 style="margin-bottom: 30px;">Appointments</h1>
 
 @if (TempData["NotificationErrorMessage"] != null)
 {
@@ -18,27 +18,28 @@
         @TempData["SuccessNotificationMessage"]
     </div>
 }
-@* <div>
-    <form asp-action="SendAppointmentReminderEmails">
-        <button type="submit" class="btn btn-primary">
-            Appointment Reminder
-        </button>
-    </form>
-</div> *@
 
-<a asp-controller="Appointments" asp-action="SendAppointmentReminderEmails" class="btn btn-danger">Appointment Reminder</a>
+<div style="display:flex; justify-content:space-between;margin-bottom:30px;">
+    <div style="display: flex; flex-direction:column;">
+    <a asp-action="Create" class="btn btn-primary" style="margin-bottom:10px">Book Appointment</a>
+    <a asp-controller="Appointments" asp-action="StaffAppointmentsHistory" class="btn btn-primary">Appointments history</a>
+    </div>
+    <div style="display:flex; flex-direction:column">
+        <a asp-controller="Appointments" asp-action="SendAppointmentReminderEmails" class="btn btn-info" style="margin-left:auto; margin-bottom:10px;">Appointment Reminder</a>
 
-<a asp-controller="Appointments" asp-action="SendClosureNotification" class="btn btn-danger">Notify All Customers of Closure</a>
-
-<p>
-    <a asp-action="Create" class="btn btn-primary">Book Appointment</a>
-</p>
+        <a asp-controller="Appointments" asp-action="SendClosureNotification" class="btn btn-info">Notify All Customers of Closure</a>
+    </div>
+    
+</div>
 
 <table class="table">
     <thead>
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.First().AppointmentDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.First().Time)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Animal.Name)
@@ -66,6 +67,9 @@
                     @Html.DisplayFor(modelItem => appointment.AppointmentDate)
                 </td>
                 <td>
+                    @Html.DisplayFor(modelItem => appointment.Time)
+                </td>
+                <td>
                     @Html.DisplayFor(modelItem => appointment.Animal.Name)
                 </td>
                 <td>
@@ -87,6 +91,6 @@
                 </td>
             </tr>
         }
-    </tbody>
-    <a asp-controller="Appointments" asp-action="StaffAppointmentsHistory" class="btn btn-danger">Appointments history</a>
+    </tbody>   
 </table>
+

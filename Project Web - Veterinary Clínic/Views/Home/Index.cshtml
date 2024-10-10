@@ -2,7 +2,54 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        
+        <div class="col-md-12 text-center">
+            <h1 class="display-4 mb-3">Welcome to Veterinary Clinic Sanlez</h1>
+            <p class="lead">Providing the best care for your beloved pets.</p>
+            <hr class="my-4">
+        </div>
+    </div>
+
+    <div class="row text-center mt-5">
+        <div class="col-md-4">
+            <div class="card border-0 shadow">
+                <div class="card-body">
+                    <i class="fas fa-paw fa-3x mb-3" style="color: #4CAF50;"></i>
+                    <h5 class="card-title">Animal Care</h5>
+                    <p class="card-text">High-quality care for all animals, from routine checkups to specialized treatments.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow">
+                <div class="card-body">
+                    <i class="fas fa-user-md fa-3x mb-3" style="color: #4CAF50;"></i>
+                    <h5 class="card-title">Experienced Veterinarians</h5>
+                    <p class="card-text">Our team consists of highly qualified veterinarians with years of experience.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow">
+                <div class="card-body">
+                    <i class="fas fa-calendar-alt fa-3x mb-3" style="color: #4CAF50;"></i>
+                    <h5 class="card-title">Appointments</h5>
+                    <p class="card-text">Book appointments online and manage your pet’s health efficiently.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+   
+    <div class="row text-center mt-5">
+        <div class="col-md-6 offset-md-3">
+            <h2>About Us</h2>
+            <p>At Veterinary Sanlez, we treat your pets as our own. Our state-of-the-art facilities and compassionate staff ensure the best treatment for your furry family members.</p>
+        </div>
+    </div>
 </div>

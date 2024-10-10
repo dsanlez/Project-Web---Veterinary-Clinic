@@ -27,8 +27,6 @@ namespace Project_Web___Veterinary_Clínic
         {
             services.AddIdentity<User, IdentityRole>(cfg =>
             {
-                ///Atualizar em contexto de produção
-
                 cfg.User.RequireUniqueEmail = true;
                 cfg.Password.RequireDigit = false;
                 cfg.Password.RequiredUniqueChars = 0;

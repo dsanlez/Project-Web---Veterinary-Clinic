@@ -9,9 +9,12 @@ namespace Project_Web___Veterinary_Clínic.Models
     {
         public int Id { get; set; }
 
-        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm }", ApplyFormatInEditMode = true)]
+        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
         [Required]
         public DateTime Date { get; set; }
+
+        [Required]
+        public string Time { get; set; }
 
         [Required]
         public int AnimalId { get; set; }

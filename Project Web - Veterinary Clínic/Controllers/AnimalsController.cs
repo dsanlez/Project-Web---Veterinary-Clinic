@@ -5,6 +5,7 @@ using Project_Web___Veterinary_Clínic.Data;
 using Project_Web___Veterinary_Clínic.Data.Entities;
 using Project_Web___Veterinary_Clínic.Helpers;
 using Project_Web___Veterinary_Clínic.Models;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -81,7 +82,6 @@ namespace Project_Web___Veterinary_Clínic.Controllers
         {
             if (ModelState.IsValid)
             {
-
                 var path = string.Empty;
 
                 if (model.ImageFile != null && model.ImageFile.Length > 0)
@@ -89,13 +89,33 @@ namespace Project_Web___Veterinary_Clínic.Controllers
                     path = await _imageHelper.UploadImageAsync(model.ImageFile, "animals");
 
                 }
+                else
+                {
+                    ModelState.AddModelError("ImageFile", "The Image is required.");
+                }
 
-                var animal = _converterHelper.ToAnimal(model, path, true);
+                var today = DateTime.Today;
+                var maxBirthDate = today.AddYears(-20);
 
-                await _animalRepository.CreateAsync(animal);
+                if (model.BirthDate > today)
+                {
+                    ModelState.AddModelError("BirthDate", "Date of birth cannot be in the future.");
+                }
+                if (model.BirthDate < maxBirthDate)
+                {
+                    ModelState.AddModelError("BirthDate", "Date of birth must be within the last 20 years.");
+                }
 
-                return RedirectToAction(nameof(Index));
+                if (ModelState.IsValid)
+                {
+                    var animal = _converterHelper.ToAnimal(model, path, true);
+                    await _animalRepository.CreateAsync(animal);
+                    return RedirectToAction(nameof(Index));
+                }
             }
+            var users = await _userHelper.GetAllCustomersAsync();
+            model.Owners = users.ToList();
+
             return View(model);
         }
 
@@ -117,7 +137,6 @@ namespace Project_Web___Veterinary_Clínic.Controllers
             }
 
             var owners = await _userHelper.GetAllCustomersAsync();
-
 
             var model = _converterHelper.ToAnimalViewModel(animal, owners);
 
@@ -142,13 +161,26 @@ namespace Project_Web___Veterinary_Clínic.Controllers
                     {
                         path = await _imageHelper.UploadImageAsync(model.ImageFile, "animals");
                     }
+                    var today = DateTime.Today;
+                    var maxBirthDate = today.AddYears(-20);
 
-                    var animal = _converterHelper.ToAnimal(model, path, false);
+                    if (model.BirthDate > today)
+                    {
+                        ModelState.AddModelError("BirthDate", "Date of birth cannot be in the future.");
+                    }
+                    if (model.BirthDate < maxBirthDate)
+                    {
+                        ModelState.AddModelError("BirthDate", "Date of birth must be within the last 20 years.");
+                    }
+                    
+                    if (ModelState.IsValid)
+                    {
+                        var animal = _converterHelper.ToAnimal(model, path, false);
+                        animal.Owner = await _userHelper.GetUserByIdAsync(model.OwnerId);
 
-                    animal.Owner = await _userHelper.GetUserByIdAsync(model.OwnerId);
-
-                    await _animalRepository.UpdateAsync(animal);
-
+                        await _animalRepository.UpdateAsync(animal);
+                        return RedirectToAction(nameof(Index));
+                    }
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -161,10 +193,32 @@ namespace Project_Web___Veterinary_Clínic.Controllers
                         return new NotFoundViewResult("Error404");
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
             model.Owners = await _userHelper.GetAllCustomersAsync();
             return View(model);
+
+            //        var animal = _converterHelper.ToAnimal(model, path, false);
+
+            //        animal.Owner = await _userHelper.GetUserByIdAsync(model.OwnerId);
+
+            //        await _animalRepository.UpdateAsync(animal);
+
+            //    }
+            //    catch (DbUpdateConcurrencyException)
+            //    {
+            //        if (!await _animalRepository.ExistsAsync(model.Id))
+            //        {
+            //            return new NotFoundViewResult("AnimalNotFound");
+            //        }
+            //        else
+            //        {
+            //            return new NotFoundViewResult("Error404");
+            //        }
+            //    }
+            //    return RedirectToAction(nameof(Index));
+            //}
+            //model.Owners = await _userHelper.GetAllCustomersAsync();
+            //return View(model);
         }
 
         // GET: Animals/Delete/5
@@ -194,17 +248,17 @@ namespace Project_Web___Veterinary_Clínic.Controllers
         {
 
             var animal = await _animalRepository.GetByIdAsync(id);
-            
+
             if (animal == null)
             {
                 return new NotFoundViewResult("AnimalNotFound");
             }
 
-            var relatedAppointments =  _appointmentRepository.GetAppointmentsByAnimalId(animal.Id);
+            var relatedAppointments = _appointmentRepository.GetAppointmentsByAnimalId(animal.Id);
 
             if (relatedAppointments.Any())
             {
-                
+
                 ModelState.AddModelError(string.Empty, "This animal has associated appointments. Please delete the appointments first.");
 
                 return View(animal);
@@ -221,7 +275,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
         {
             var user = await _userHelper.GetUserByEmailAsync(this.User.Identity.Name);
 
-            return View( await _animalRepository.GetAllAnimalsByCustomerIdAsync(user.Id.ToString()));
+            return View(await _animalRepository.GetAllAnimalsByCustomerIdAsync(user.Id.ToString()));
         }
         public IActionResult AnimalNotFound()
         {

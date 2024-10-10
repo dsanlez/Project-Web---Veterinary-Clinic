@@ -51,7 +51,6 @@ namespace Project_Web___Veterinary_Clínic.Data
 
         public async Task<IEnumerable<AppointmentViewModel>> GetAppointmentsByVeterinarianAndDate(string veterinarianId, DateTime date)
         {
-
             var appointments = await _context.Appointments
                 .Where(a => a.VeterinarianId == veterinarianId && a.AppointmentDate.Date == date.Date)
                 .Select(a => new AppointmentViewModel
@@ -62,7 +61,7 @@ namespace Project_Web___Veterinary_Clínic.Data
 
                     Animals = new List<SelectListItem>
                     {
-                    new SelectListItem { Value = a.AnimalId.ToString(), Text = a.Animal.Name } // Get the animal name
+                    new SelectListItem { Value = a.AnimalId.ToString(), Text = a.Animal.Name }
                     },
                     VeterinarianId = a.VeterinarianId,
 
@@ -70,14 +69,15 @@ namespace Project_Web___Veterinary_Clínic.Data
 
                     Customers = new List<SelectListItem>
                     {
-                    new SelectListItem { Value = a.CustomerId, Text = a.Customer.FullName } // Get the customer name
+                    new SelectListItem { Value = a.CustomerId, Text = a.Customer.FullName }
                     },
                     RoomId = a.RoomId,
 
                     Rooms = new List<SelectListItem>
                     {
-                    new SelectListItem { Value = a.RoomId.ToString(), Text = a.Room.Name } // Get the room name
-                    }
+                    new SelectListItem { Value = a.RoomId.ToString(), Text = a.Room.Name }
+                    },
+                    Time = a.Time
                 })
                 .ToListAsync();
 
@@ -97,7 +97,7 @@ namespace Project_Web___Veterinary_Clínic.Data
 
         public async Task<IEnumerable<Appointment>> GetRecentAlertsForStaffAsync()
         {
-            var recentDate = DateTime.Today; 
+            var recentDate = DateTime.Today;
 
             return await _context.Appointments
                 .Include(a => a.Customer)

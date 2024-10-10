@@ -17,9 +17,12 @@ namespace Project_Web___Veterinary_Clínic.Data.Entities
         public string CustomerId { get; set; }
 
         [Required]
-        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm }", ApplyFormatInEditMode = true)]
+        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
         [Display(Name = "Appointment Date")]
         public DateTime AppointmentDate { get; set; }
+
+        [Required]
+        public string Time { get; set; }
 
         [Required]
         [MaxLength(20)]

@@ -1,4 +1,4 @@
-﻿@model Project_Web___Veterinary_Clínic.Models.AppointmentViewModel
+﻿@* @model Project_Web___Veterinary_Clínic.Models.AppointmentViewModel
 
 <h2>Create Appointment</h2>
 
@@ -18,20 +18,6 @@
 <form asp-action="Create">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <div class="form-group">
-        <label asp-for="Date"></label>
-        <input asp-for="Date" class="form-control" />
-        <span asp-validation-for="Date" class="text-danger"></span>
-    </div>
-    <table id="appointmentsTable2" class="table">
-        <thead>
-            <tr>
-                <th>Slot Available</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
-    <div class="form-group">
         <label asp-for="AnimalId" class="control-label" >Animal</label>
         <select asp-for="AnimalId" asp-items="Model.Animals" class="form-control">
             <option value="">Select a animal</option>
@@ -45,6 +31,20 @@
         </select>
         <span asp-validation-for="VeterinarianId" class="text-danger"></span>
     </div>
+    <div class="form-group">
+        <label asp-for="Date"></label>
+        <input asp-for="Date" class="form-control"  />
+        <span asp-validation-for="Date" class="text-danger"></span>
+    </div>
+    <table id="appointmentsTable2" class="table">
+        <thead>
+            <tr>
+                <th>Slot Available</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
 
     <button type="submit" class="btn btn-primary">Create</button>
 </form>
@@ -99,4 +99,146 @@
     </script>
 
 }
+
+ *@
+
+@model Project_Web___Veterinary_Clínic.Models.AppointmentViewModel
+
+<h2>Create Appointment</h2>
+
+@if (TempData["AppointmentError"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["AppointmentError"]
+    </div>
+}
+@if (TempData["SuccessAppointment"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessAppointment"]
+    </div>
+}
+
+<form asp-action="Create">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="form-group">
+        <label asp-for="AnimalId" class="control-label">Animal</label>
+        <select asp-for="AnimalId" asp-items="Model.Animals" class="form-control">
+            <option value="">Select an animal</option>
+        </select>
+        <span asp-validation-for="AnimalId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="VeterinarianId">Veterinarian</label>
+        <select asp-for="VeterinarianId" asp-items="Model.Veterinarians" class="form-control">
+            <option value="">Select a veterinarian</option>
+        </select>
+        <span asp-validation-for="VeterinarianId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Date"></label>
+        <input asp-for="Date" class="form-control" type="date" min="@DateTime.Today.ToString("yyyy-MM-dd")" id="appointmentDate" />
+        <span asp-validation-for="Date" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="timeSelect">Select Time</label>
+        <select id="timeSelect" name="Time" class="form-control" required>
+            <option value="">Select a time</option>
+        </select>
+        <span asp-validation-for="Time" class="text-danger"></span>
+    </div>
+
+    <table id="appointmentsTable2" class="table">
+        <thead>
+            <tr>
+                <th>Slot Available</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <button type="submit" class="btn btn-primary">Create</button>
+</form>
+
+<div>
+    <a asp-action="Index" class="btn btn-success">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // Wait for the DOM to be fully loaded before executing any scripts
+        $(document).ready(function () {
+
+            // Function to populate the time slots dropdown
+            function populateTimeSlots(availableSlots) {
+                const timeSelect = $('#timeSelect'); // Select the dropdown element for time slots
+                timeSelect.empty(); // Clear any existing options in the dropdown
+                timeSelect.append('<option value="">Select a time</option>'); // Add a default option
+
+                // Loop through the available slots and append them as options in the dropdown
+                availableSlots.forEach(function (slot) {
+                    timeSelect.append(`<option value="${slot}">${slot}</option>`); // Add each slot as an option
+                });
+            }
+
+            // Attach a change event listener to the appointment date and veterinarian ID dropdowns
+            $('#appointmentDate, #VeterinarianId').change(function () {
+                var selectedDate = $('#appointmentDate').val(); // Get the selected date from the date input
+                var veterinarianId = $('#VeterinarianId').val(); // Get the selected veterinarian ID from the dropdown
+
+                // Check if both the date and veterinarian ID are selected
+                if (selectedDate && veterinarianId) {
+                    // Make an AJAX GET request to fetch available time slots
+                    $.ajax({
+                        url: '@Url.Action("GetAvailableSlots", "Appointments")', // URL to the action method
+                        type: 'GET', // Type of request
+                        data: { date: selectedDate, veterinarianId: veterinarianId }, // Send selected date and veterinarian ID as data
+                        success: function (availableSlots) { // Callback function on success
+                            $('#appointmentsTable2 tbody').empty(); // Clear any existing rows in the appointments table
+
+                            // Check if there are available slots returned
+                            if (availableSlots.length > 0) {
+                                let row = '<tr><td>'; // Start a new table row
+                                // Loop through the available slots and concatenate them into a single string
+                                availableSlots.forEach(function (slot) {
+                                    row += `${slot}, `; // Append each slot followed by a comma
+                                });
+                                row += '</td></tr>'; // Close the table row
+                                $('#appointmentsTable2 tbody').append(row); // Add the row to the appointments table
+
+                                // Call the function to populate the time slots dropdown with available slots
+                                populateTimeSlots(availableSlots);
+                            } else {
+                                // If no slots are available, show a message in the table
+                                $('#appointmentsTable2 tbody').append(`
+                                            <tr>
+                                                <td colspan="4">No available slots for this day.</td>
+                                            </tr>
+                                        `);
+
+                                // Call the function to clear the time slots dropdown
+                                populateTimeSlots([]);
+                            }
+                        },
+                        error: function () { // Callback function on error
+                            alert("Error retrieving available slots. Please try again."); // Show an alert if there's an error
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+
+
+}
+
 

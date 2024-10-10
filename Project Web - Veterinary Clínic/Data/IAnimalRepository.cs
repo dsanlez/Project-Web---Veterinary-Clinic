@@ -14,7 +14,6 @@ namespace Project_Web___Veterinary_Clínic.Data
 
         Task<Animal> GetByAnimalIdAsync(int id);
 
-
         Task<IEnumerable<SelectListItem>> GetAnimalsByOwnerAsync(string ownerId);
 
         Task<IEnumerable<Animal>> GetAllAnimalsByCustomerIdAsync(string customerId);

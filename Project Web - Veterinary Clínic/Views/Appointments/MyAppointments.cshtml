@@ -22,6 +22,9 @@
                 @Html.DisplayNameFor(model => model.First().AppointmentDate)
             </th>
             <th>
+                @Html.DisplayNameFor(model => model.First().Time)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.First().Animal.Name)
             </th>
             <th>
@@ -42,6 +45,9 @@
             <tr>
                 <td>
                     @Html.DisplayFor(modelItem => appointment.AppointmentDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => appointment.Time)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => appointment.Animal.Name)

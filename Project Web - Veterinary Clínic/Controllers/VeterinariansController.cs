@@ -287,6 +287,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
                 CustomerName = a.Customer.FullName,
                 VeterinarianName = a.Veterinarian.FullName,
                 AppointmentDate = a.AppointmentDate,
+                Time = a.Time,
                 Status = a.Status,
                 Message = GenerateAlertMessage(a)
             }).ToList();          
@@ -301,8 +302,8 @@ namespace Project_Web___Veterinary_Clínic.Controllers
             return appointment.Status switch
             {
                 "Scheduled" => $"New appointment scheduled by {customerName}. (Last modified: {lastModified})",
-                "Rescheduled" => $"Appointment with {customerName} has been Rescheduled to {appointment.AppointmentDate}. (Last modified: {lastModified})",
-                "Cancelled" => $"Appointment with {customerName} has been cancelled. (Last modified: {lastModified})",
+                "Rescheduled" => $"Appointment Rescheduled by {customerName}. (Last modified: {lastModified})",
+                "Cancelled" => $"Appointment cancelled by {customerName}. (Last modified: {lastModified})",
                 _ => "Unknown status change."
             };
         }

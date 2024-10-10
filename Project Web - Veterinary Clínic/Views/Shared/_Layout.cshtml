@@ -7,27 +7,21 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/lib/font-awesome/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css?family=Raleway:500,800" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/css/site.css" />
     <!-- Syncfusion ASP.NET Core controls styles -->
     <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/27.1.48/fluent.css" />
     <!-- Syncfusion ASP.NET Core controls scripts -->
-    <style>
-        .actPage {
-            border-bottom:1px solid black;
-            font-weight: bold
-        }
-        .backgroundcolorbar
-        {
-            background-color:lightgreen
-        }
-    </style>
     <script src="https://cdn.syncfusion.com/ej2/27.1.48/dist/ej2.min.js"></script>
+    
 </head>
-<body>
+<body class="bg-light">
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light border-bottom box-shadow mb-3" style="background-color:lightgreen;  font-family: 'PT Serif, serif'; font-weight: 400; font-style: normal; font-size:20px;">
             <div class="container">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Veterinary_Clínic</a>
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+                    <img src="~/images/pet.png" alt="Veterinary Clinic" style="height: 70px; margin-left: -30px;" />
+                </a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -35,40 +29,37 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-                            <a class="nav-link  actPage text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home <i class="fas fa-home"></i></a>
                         </li>
                         @if (!this.User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Veterinarians" asp-action="VeterinariansAndSpecialties">Veterinarians</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Veterinarians" asp-action="VeterinariansAndSpecialties">Veterinarians <i class="fas fa-user-md"></i></a>
                             </li>
                         }
                         @if (this.User.Identity.IsAuthenticated && this.User.IsInRole("Customer"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Animals" asp-action="GetAllAnimalsByOwner">Animals</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Animals" asp-action="GetAllAnimalsByOwner">Animals <i class="fas fa-paw"></i></a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Appointments" asp-action="MyAppointments">Appointments</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Appointments" asp-action="MyAppointments">Appointments <i class="fas fa-calendar-alt"></i></a>
                             </li>
                         }
 
                         @if (this.User.Identity.IsAuthenticated && this.User.IsInRole("Veterinarian"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Animals" asp-action="Index">Animals</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Animals" asp-action="Index">Animals <i class="fas fa-paw"></i></a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Customers" asp-action="Index">Customers</a>
+                                <a class="nav-link text-dark" asp-controller="Customers" asp-action="Index">Customers <i class="fas fa-user"></i></a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Appointments" asp-action="Index">Appointments</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Appointments" asp-action="Index">Appointments <i class="fas fa-calendar-alt"></i></a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Veterinarians" asp-action="Dashboard">Dashboard</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Veterinarians" asp-action="Dashboard">Dashboard <i class="fas fa-th-large"></i></a>
                             </li>
                            
                         }
@@ -78,7 +69,7 @@
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Rooms" asp-action="Index">Rooms</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Veterinarians" asp-action="Index">Veterinarians</a>
+                                <a class="nav-link text-dark" asp-controller="Veterinarians" asp-action="Index">Veterinarians <i class="fas fa-user-md"></i></a>
                             </li>
 
                         }
@@ -91,13 +82,13 @@
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="ChangeUser">@this.User.Identity.Name</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Logout">Logout</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Logout">Logout  <i class="fas fa-sign-out-alt"></i></a>
                             </li>
                         }
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Login <i class="fas fa-sign-in-alt"></i></a>
                             </li>
                         }
                     </ul>
@@ -105,17 +96,43 @@
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
+    <div style="display:flex; align-items:center; justify-content: space-evenly;">
+        <div style="width: 250px; height:350px; background-image:url('/images/Labrador6.png'); background-size:cover; background-position:center;">
+         
+        </div>
+
+        <div>
+            <main role="main" class="pb-3">
+                <div class="my-3 p-3 bg-white rounded box-shadow">
+                    @RenderBody()
+                    </div>
+            </main>
+        </div> 
+
+        <div style="width: 250px; height:350px; background-image:url('/images/CuteCat4.png'); background-size:cover; background-position:center;">
+        </div>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2024 - Project_Web___Veterinary_Clínic - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+
+    <footer class="border-top footer text-muted mt-auto" style="background-color: lightgreen; color: black; padding: 5px 0; font-size: 0.85em;line-height:24px; padding:20px 0;">
+        <div class="container d-flex justify-content-between">
+            <div class="text-md-right">
+                <p class="mb-0" style="color:#000000">Contact us: (123) 456-7890 | Email: ClinícSanlez@vetclinic.com</p>
+                <p class="mb-0" style="color:#000000">&copy; 2024 - Cliníc Sanlez</p>
+                <p class="mb-0" style="color:#000000">Schedule: Everyday from 09:00 to 17:00</p>
+            </div>
+            <div>
+                <p class="mb-0"><a href="https://www.facebook.com" class="text-black"><i class="fab fa-facebook"></i> Facebook</a></p>
+                <p class="mb-0"><a href="https://www.instragram.com" class="text-black"><i class="fab fa-instagram"></i> Instagram</a></p>
+            </div>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
