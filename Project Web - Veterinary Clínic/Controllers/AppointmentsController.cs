@@ -84,21 +84,6 @@ namespace Project_Web___Veterinary_Clínic.Controllers
                 }
                 var existingAppointments = await _appointmentRepository.GetAppointmentsByVeterinarianAsync(model.VeterinarianId);
 
-                //var startTime = model.Date.AddMinutes(Convert.ToDouble(model.Time.Split(":")[0])*60).AddMinutes(Convert.ToDouble(model.Time.Split(":")[1]));
-                //var endTime = startTime.AddMinutes(30);
-
-                //bool isConflict = existingAppointments.Any(a =>
-                //    (a.AppointmentDate < endTime && a.AppointmentDate.AddMinutes(30) > startTime));
-
-                //if (isConflict)
-                //{
-                //    TempData["AppointmentError"] = "The appointment cannot be scheduled at this time because there is already an appointment booked.";
-
-                //    model.Animals = (await _animalRepository.GetAllAnimalsAsync()).ToList();
-                //    model.Veterinarians = (await _userHelper.GetAllVeterinariansAsync()).ToList();
-                //    return View(model);
-                //}
-
                 var veterinarian = await _userHelper.GetVeterinarianByIdAsync(model.VeterinarianId);
 
                 model.RoomId = veterinarian.Room.Id;
@@ -179,25 +164,6 @@ namespace Project_Web___Veterinary_Clínic.Controllers
                     return View(model);
                 }
                 var existingAppointments = await _appointmentRepository.GetAppointmentsByVeterinarianAsync(model.VeterinarianId);
-
-                //var startTime = model.Date;
-                //var endTime = startTime.AddMinutes(30);
-
-                //bool isConflict = existingAppointments.Any(a =>
-                //    (a.AppointmentDate < endTime && a.AppointmentDate.AddMinutes(30) > startTime));
-
-                //if (isConflict)
-                //{
-                //    TempData["NotificationErrorMessage"] = "The appointment cannot be scheduled at this time because there is already an appointment booked.";
-
-
-                //    model.Animals = (await _animalRepository.GetAllAnimalsAsync()).ToList();
-                //    model.Veterinarians = (await _userHelper.GetAllVeterinariansAsync()).ToList();
-                //    model.Customers = (await _userHelper.GetAllCustomersAsync()).ToList();
-                //    model.Rooms = (await _roomRepository.GetAllRoomsAsync()).ToList();
-
-                //    return View(model);
-                //}
 
                 var veterinarian = await _userHelper.GetVeterinarianByIdAsync(model.VeterinarianId);
 
@@ -491,22 +457,6 @@ namespace Project_Web___Veterinary_Clínic.Controllers
                     return View(model);
                 }
 
-                //var existingAppointments = await _appointmentRepository.GetAppointmentsByVeterinarianAsync(model.VeterinarianId);
-                //var startTime = model.Date;
-                //var endTime = startTime.AddMinutes(30);
-
-                //bool isConflict = existingAppointments.Any(a =>
-                //    (a.AppointmentDate < endTime && a.AppointmentDate.AddMinutes(30) > startTime));
-
-                //if (isConflict)
-                //{
-                //    TempData["AppointmentError"] = "The appointment cannot be scheduled because there is already an appointment booked.";
-
-                //    model.Animals = await _animalRepository.GetAnimalsByOwnerAsync(user.Id);
-                //    model.Veterinarians = (await _userHelper.GetAllVeterinariansAsync()).ToList();
-                //    return View(model);
-                //}
-
                 var veterinarian = await _userHelper.GetVeterinarianByIdAsync(model.VeterinarianId);
                 model.RoomId = veterinarian.Room.Id;
 
@@ -590,25 +540,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
 
                     return View(model);
                 }
-
                 var existingAppointments = await _appointmentRepository.GetAppointmentsByVeterinarianAsync(model.VeterinarianId);
-
-                //var startTime = model.Date;
-                //var endTime = startTime.AddMinutes(30);
-
-                //bool isConflict = existingAppointments.Any(a =>
-                //    a.Id != id &&
-                //    (a.AppointmentDate < endTime && a.AppointmentDate.AddMinutes(30) > startTime));
-
-                //if (isConflict)
-                //{
-                //    TempData["AppointmentError"] = "The appointment cannot be rescheduled because there is already an appointment booked for the selected time.";
-
-                //    model.Animals = await _animalRepository.GetAnimalsByOwnerAsync(user.Id);
-                //    model.Veterinarians = (await _userHelper.GetAllVeterinariansAsync()).ToList();
-
-                //    return View(model);
-                //}
 
                 appointment.AppointmentDate = model.Date;
                 appointment.VeterinarianId = model.VeterinarianId;

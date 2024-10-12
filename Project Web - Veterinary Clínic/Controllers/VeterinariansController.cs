@@ -193,6 +193,15 @@ namespace Project_Web___Veterinary_Clínic.Controllers
                     return View(model);
                 }
 
+                var existingPhoneNumberUser = await _userHelper.GetUserByPhoneNumberAsync(model.PhoneNumber);
+
+                if (existingPhoneNumberUser != null)
+                {
+                    ModelState.AddModelError(string.Empty, "This phone number is already registered.");
+                    model.Rooms = await _roomRepository.GetAllRoomsAsync();
+                    return View(model);
+                }
+
                 veterinarian.FirstName = model.FirstName;
                 veterinarian.LastName = model.LastName;
                 veterinarian.Email = model.Username;

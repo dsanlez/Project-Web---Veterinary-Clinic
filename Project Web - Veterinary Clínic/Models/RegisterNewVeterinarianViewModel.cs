@@ -33,7 +33,8 @@ namespace Project_Web___Veterinary_Clínic.Models
         public string Address { get; set; }
 
         [Required]
-        [MaxLength(20, ErrorMessage = "The field {0} can only contain {1} characters.")]
+        //[MaxLength(20, ErrorMessage = "The field {0} can only contain {1} characters.")]
+        [RegularExpression(@"^\d{9}$", ErrorMessage = "The field {0} must contain exactly 9 digits.")]
         public string PhoneNumber { get; set; }
 
         [Required]

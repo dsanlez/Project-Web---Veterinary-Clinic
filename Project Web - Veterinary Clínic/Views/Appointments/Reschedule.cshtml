@@ -1,127 +1,6 @@
-﻿@* @model Project_Web___Veterinary_Clínic.Models.AppointmentViewModel
+﻿
 
-@{
-    ViewData["Title"] = "Reschedule Appointment";
-}
-
-<h2>Reschedule Appointment</h2>
-
-@if (TempData["AppointmentError"] != null)
-{
-    <div class="alert alert-danger">
-        @TempData["AppointmentError"]
-    </div>
-}
-
-
-<form asp-action="Reschedule">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <div class="form-group">
-        <label asp-for="Date" class="control-label">Appointment Date</label>
-        <input asp-for="Date" class="form-control"
-               type="datetime-local"
-               value="@Model.Date.ToString("yyyy-MM-ddTHH:mm")" />
-        <span asp-validation-for="Date" class="text-danger"></span>
-    </div>
-    <table id="appointmentsTable2" class="table">
-        <thead>
-            <tr>
-                <th>Slot Available</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
-    <div class="form-group">
-        <label asp-for="AnimalId" class="control-label">Animal</label>
-        <select asp-for="AnimalId" class="form-control" asp-items="Model.Animals">
-            <option value="">Select an animal</option>
-        </select>
-        <span asp-validation-for="AnimalId" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="VeterinarianId" class="control-label">Veterinarian</label>
-        <select asp-for="VeterinarianId" class="form-control" asp-items="Model.Veterinarians">
-            <option value="">Select a veterinarian</option>
-        </select>
-        <span asp-validation-for="VeterinarianId" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <input type="submit" value="Reschedule" class="btn btn-primary" />
-    </div>
-</form>
-<div>
-    <a asp-action="MyAppointments" class="btn btn-success">Back to My Appointments</a>
-</div>
-
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-
-    <script>
-    $(document).ready(function () {
-        // Define a function to get available slots
-        function getAvailableSlots() {
-            var selectedDate = $('#Date').val();
-            var veterinarianId = $('#VeterinarianId').val();
-
-            if (selectedDate && veterinarianId) {
-                $.ajax({
-                    url: '@Url.Action("GetAvailableSlots", "Appointments")',
-                    type: 'GET',
-                    data: { date: selectedDate, veterinarianId: veterinarianId },
-                    beforeSend: function () {
-                        // Show a loader or message before sending the request
-                        $('#appointmentsTable2 tbody').empty().append('<tr><td>Loading...</td></tr>');
-                    },
-                    success: function (availableSlots) {
-                        // Clear the table content
-                        $('#appointmentsTable2 tbody').empty();
-
-                        if (availableSlots.length > 0) {
-                                var row = '<tr><td>'
-                            availableSlots.forEach(function (slot) {
-                                    row += `&nbsp;&nbsp; ${slot} &nbsp;&nbsp;`;
-                            });
-                                row += '</td></tr>';
-                            $('#appointmentsTable2 tbody').append(row);
-                        } else {
-                            $('#appointmentsTable2 tbody').append(`
-                                <tr>
-                                    <td colspan="4">No available slots for this day.</td>
-                                </tr>
-                            `);
-                        }
-                    },
-                    error: function () {
-                        // Handle the error
-                        $('#appointmentsTable2 tbody').empty().append(`
-                            <tr>
-                                <td colspan="4">Error retrieving available slots. Please try again.</td>
-                            </tr>
-                        `);
-                    }
-                });
-            }
-        }
-
-        // Call the function when the page loads
-        getAvailableSlots();
-
-        // Bind the change event to the function for Date and VeterinarianId
-        $('#Date, #VeterinarianId').change(function () {
-            getAvailableSlots();
-        });
-    });
-</script>
-
-} *@
-
-                                @model Project_Web___Veterinary_Clínic.Models.AppointmentViewModel
+@model Project_Web___Veterinary_Clínic.Models.AppointmentViewModel
 
 @{
     ViewData["Title"] = "Reschedule Appointment";
@@ -174,7 +53,7 @@
         <span asp-validation-for="Time" class="text-danger"></span>
     </div>
 
-    <table id="appointmentsTable2" class="table">
+  @*   <table id="appointmentsTable2" class="table">
         <thead>
             <tr>
                 <th>Slot Available</th>
@@ -182,7 +61,7 @@
         </thead>
         <tbody>
         </tbody>
-    </table>
+    </table> *@
 
     <div class="form-group">
         <input type="submit" value="Reschedule" class="btn btn-primary" />

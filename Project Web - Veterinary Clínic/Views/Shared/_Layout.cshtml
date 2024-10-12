@@ -96,12 +96,12 @@
             </div>
         </nav>
     </header>
-    <div style="display:flex; align-items:center; justify-content: space-evenly;">
+    <div style="display:flex; align-items:center; justify-content: space-evenly; flex-wrap: wrap;">
         <div style="width: 250px; height:350px; background-image:url('/images/Labrador6.png'); background-size:cover; background-position:center;">
          
         </div>
 
-        <div>
+        <div style="flex-grow:1; max-width: 1220px;">
             <main role="main" class="pb-3">
                 <div class="my-3 p-3 bg-white rounded box-shadow">
                     @RenderBody()
@@ -125,6 +125,7 @@
                 <p class="mb-0" style="color:#000000">Contact us: (123) 456-7890 | Email: ClinícSanlez@vetclinic.com</p>
                 <p class="mb-0" style="color:#000000">&copy; 2024 - Cliníc Sanlez</p>
                 <p class="mb-0" style="color:#000000">Schedule: Everyday from 09:00 to 17:00</p>
+                <p class="mb-0"><a style="color:#000000; text-decoration:underline" class="nav-link " asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a></p>
             </div>
             <div>
                 <p class="mb-0"><a href="https://www.facebook.com" class="text-black"><i class="fab fa-facebook"></i> Facebook</a></p>

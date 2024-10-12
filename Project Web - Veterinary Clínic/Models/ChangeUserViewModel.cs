@@ -17,6 +17,7 @@ namespace Project_Web___Veterinary_Clínic.Models
         public string Address { get; set; }
 
         [Required]
+        [RegularExpression(@"^\d{9}$", ErrorMessage = "The field {0} must contain exactly 9 digits.")]
         public string Phonenumber { get; set; }
 
         [Display(Name = "Profile Picture")]

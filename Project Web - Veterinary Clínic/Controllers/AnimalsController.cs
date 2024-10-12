@@ -73,8 +73,6 @@ namespace Project_Web___Veterinary_Clínic.Controllers
         }
 
         // POST: Animals/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Veterinarian")]
@@ -197,28 +195,6 @@ namespace Project_Web___Veterinary_Clínic.Controllers
             model.Owners = await _userHelper.GetAllCustomersAsync();
             return View(model);
 
-            //        var animal = _converterHelper.ToAnimal(model, path, false);
-
-            //        animal.Owner = await _userHelper.GetUserByIdAsync(model.OwnerId);
-
-            //        await _animalRepository.UpdateAsync(animal);
-
-            //    }
-            //    catch (DbUpdateConcurrencyException)
-            //    {
-            //        if (!await _animalRepository.ExistsAsync(model.Id))
-            //        {
-            //            return new NotFoundViewResult("AnimalNotFound");
-            //        }
-            //        else
-            //        {
-            //            return new NotFoundViewResult("Error404");
-            //        }
-            //    }
-            //    return RedirectToAction(nameof(Index));
-            //}
-            //model.Owners = await _userHelper.GetAllCustomersAsync();
-            //return View(model);
         }
 
         // GET: Animals/Delete/5
