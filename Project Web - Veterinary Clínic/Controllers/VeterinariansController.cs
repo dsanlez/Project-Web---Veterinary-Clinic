@@ -37,6 +37,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
             _appointmentRepository = appointmentRepository;
             _memoryCache = memoryCache;
         }
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
             var veterinarians =  await _userHelper.GetVeterinariansAsync();

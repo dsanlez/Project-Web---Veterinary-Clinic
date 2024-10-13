@@ -4,6 +4,7 @@ using Project_Web___Veterinary_Clínic.Data;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Project_Web___Veterinary_Clínic.Helpers;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Project_Web___Veterinary_Clínic.Controllers
 {
@@ -16,19 +17,22 @@ namespace Project_Web___Veterinary_Clínic.Controllers
             _roomRepository = roomRepository;
         }
 
+
         // List all rooms
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index()
         {
             var rooms = await _roomRepository.GetAll().ToListAsync();
             return View(rooms);
         }
-
+        [Authorize(Roles = "Admin")]
         // Render the form to create a new room
         public IActionResult Create()
         {
             return View();
         }
 
+        [Authorize(Roles = "Admin")]
         // Handle form submission to create a new room
         [HttpPost]
         public async Task<IActionResult> Create(Room room)
@@ -41,6 +45,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
             return View(room);
         }
 
+        [Authorize(Roles = "Admin")]
         // Edit room - Render the form
         public async Task<IActionResult> Edit(int id)
         {
@@ -54,6 +59,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
             return View(room);
         }
 
+        [Authorize(Roles = "Admin")]
         // Handle form submission to edit room
         [HttpPost]
         public async Task<IActionResult> Edit(Room room)
@@ -66,6 +72,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
             return View(room);
         }
 
+        [Authorize(Roles = "Admin")]
         // Delete room - Render confirmation page
         public async Task<IActionResult> Delete(int id)
         {
@@ -79,6 +86,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
             return View(room);
         }
 
+        [Authorize(Roles = "Admin")]
         // Handle form submission to delete room
         [HttpPost, ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -103,6 +111,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
         }
 
         // Render the details of a room
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Details(int id)
         {
             var room = await _roomRepository.GetByIdAsync(id);

@@ -1,9 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.CodeAnalysis;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using static Project_Web___Veterinary_Clínic.Data.Entities.User;
 
 namespace Project_Web___Veterinary_Clínic.Models
 {

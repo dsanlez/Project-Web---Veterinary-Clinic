@@ -34,6 +34,7 @@ namespace Project_Web___Veterinary_Clínic.Controllers
             _emailHelper = emailHelper;
 
         }
+        [Authorize(Roles = "Veterinarian")]
         public async Task<IActionResult> Index()
         {
             var appointments = (await _appointmentRepository.GetAllWithUsersAsync())
