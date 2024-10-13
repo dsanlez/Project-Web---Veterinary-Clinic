@@ -32,7 +32,7 @@ namespace Project_Web___Veterinary_Clínic.Models
         public string PhoneNumber { get; set; }
 
         [Required]
-        [MinLength(6)]
+        [MinLength(6, ErrorMessage = "The field {0} must atleast contain {1} characters.")]
         public string Password { get; set; }
 
         [Required]
