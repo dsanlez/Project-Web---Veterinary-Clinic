@@ -36,7 +36,8 @@ namespace Project_Web___Veterinary_Clínic.Data.Entities
                     return null;
                 }
 
-                return $"https://localhost:44363{ImageUrl.Substring(1)}";
+                //return $"https://localhost:44363{ImageUrl.Substring(1)}";
+                return $"http://www.VeterinaryClinicSanlez.somee.com{ImageUrl.Substring(1)}";
             }
         }
 
